@@ -6,6 +6,8 @@ import { configureExpressSession as expressSession } from "./configurations/expr
 import "./configurations/passport";
 import { authRouter } from "./routes/auth.route";
 import passport from "passport";
+import { workerRouter } from "./routes/worker.route";
+import { catchError } from "./configurations/error";
 
 export const app = express();
 
@@ -17,3 +19,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/api", authRouter);
+app.use("/api/worker", workerRouter);
+
+app.use(catchError);

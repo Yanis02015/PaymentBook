@@ -11,21 +11,21 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
-model User {
-  id        String     @id @default(uuid())
+model Worker {
+  id        String    @id @default(uuid())
   firstname String
   lastname  String
   matricule String
-  createAt  DateTime   @default(now())
-  posts     Payments[]
+  createAt  DateTime  @default(now())
+  posts     Payment[]
 }
 
-model Payments {
+model Payment {
   id        String   @id @default(uuid())
   payment   Int
   rest      Int      @default(0)
   acquitted Boolean  @default(false)
-  userId    String
+  workerId  String
   createAt  DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  worker    Worker   @relation(fields: [workerId], references: [id])
 }
