@@ -13,12 +13,15 @@ import { LoginFormSchema } from "@/schemas/form.schema";
 import { PATHS } from "@/utils/paths";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { HTTPError } from "ky";
 import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import * as z from "zod";
 
 export default function Login() {
+  const [isTaping, setIsTaping] = useState(true);
   const form = useForm<z.infer<typeof LoginFormSchema>>({
     resolver: zodResolver(LoginFormSchema),
     defaultValues: {
@@ -40,9 +43,17 @@ export default function Login() {
   function submit(values: z.infer<typeof LoginFormSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    submitMutation.mutate(values);
     console.log(values);
+
+    setIsTaping(false);
+    submitMutation.mutate(values);
   }
+
+  const watch = form.watch();
+
+  useEffect(() => {
+    setIsTaping(true);
+  }, [watch.username, watch.password]);
 
   return (
     <div className="sm:container px-3 flex justify-center pt-20">
@@ -59,7 +70,7 @@ export default function Login() {
             </div>
             <FormField
               control={form.control}
-              disabled={submitMutation.isLoading}
+              // disabled={submitMutation.isLoading}
               name="username"
               render={({ field, fieldState }) => (
                 <FormItem>
@@ -74,7 +85,6 @@ export default function Login() {
             <FormField
               control={form.control}
               name="password"
-              disabled={submitMutation.isLoading}
               render={({ field, fieldState }) => (
                 <FormItem>
                   <FormLabel>Mot de passe</FormLabel>
@@ -85,12 +95,21 @@ export default function Login() {
                 </FormItem>
               )}
             />
+
             <Button disabled={submitMutation.isLoading} type="submit">
               {submitMutation.isLoading && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
               Se connecter
             </Button>
+            {submitMutation.error instanceof HTTPError &&
+              !isTaping &&
+              submitMutation.error.response.status == 401 && (
+                <p className="text-destructive text-sm font-medium">
+                  ❌ La combinaison nom d'utilisateur et mot de passe est
+                  incorrect.
+                </p>
+              )}
           </form>
         </Form>
       </div>

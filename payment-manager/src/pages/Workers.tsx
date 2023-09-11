@@ -11,7 +11,10 @@ export default function Workers() {
   });
 
   return (
-    <div className="">
+    <div className="space-y-5 container">
+      <h1 className="sm:text-3xl text-2xl font-semibold tracking-tight mt-10">
+        Liste des travailleurs
+      </h1>
       <DataTable
         headerFilter
         pagination
