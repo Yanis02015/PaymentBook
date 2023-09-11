@@ -18,7 +18,7 @@ app.use(expressSession);
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/api", authRouter);
-app.use("/api/worker", workerRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/workers", workerRouter);
 
 app.use(catchError);

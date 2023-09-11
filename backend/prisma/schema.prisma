@@ -16,7 +16,8 @@ model Worker {
   firstname String
   lastname  String
   matricule String
-  createAt  DateTime  @default(now())
+  createdAt DateTime  @default(now())
+  image     String    @default("default.jpg")
   posts     Payment[]
 }
 

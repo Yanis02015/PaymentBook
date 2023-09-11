@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import passport from "passport";
+import { ExpressError } from "../utils/error";
 
 export const login = (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate("local", (err: Error | undefined, user: any) => {
@@ -17,4 +18,10 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
       return res.json("Authentification réussie");
     });
   })(req, res, next);
+};
+
+export const refresh = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.isAuthenticated())
+    return next(new ExpressError("You are not authenticated", 401));
+  res.status(200).json({ message: "You are authenticated" });
 };

@@ -6,6 +6,7 @@ export const configureExpressSession = session({
   secret: SECRET_KEY_TOKEN,
   resave: false,
   saveUninitialized: false,
+  rolling: true,
   cookie: {
     sameSite: "lax",
     httpOnly: true,
