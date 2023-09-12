@@ -3,6 +3,7 @@ import { PATHS } from "./utils/paths";
 import Login from "./pages/Login";
 import AuthLayout from "./layouts/auth";
 import Workers from "./pages/Workers";
+import Worker from "./pages/Worker";
 
 export const router = () =>
   createBrowserRouter([
@@ -34,6 +35,10 @@ export const router = () =>
         {
           path: PATHS.WORKERS,
           element: <Workers />,
+        },
+        {
+          path: PATHS.WORKER,
+          element: <Worker />,
         },
       ],
     },

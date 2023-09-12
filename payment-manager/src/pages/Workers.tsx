@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { CreateWorkerDialog } from "@/components/my/create-worker-dialog";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Workers() {
   const [createWorkerDialogVisibility, setCreateWorkerDialogVisibility] =
@@ -16,11 +17,10 @@ export default function Workers() {
     queryFn: getWorkers,
   });
 
-  const onSelectWorker = ({
-    firstname,
-    lastname,
-  }: z.infer<typeof WorkerSchema>) => {
-    alert(`Vous avez selectionner ${firstname} ${lastname}.`);
+  const navigate = useNavigate();
+
+  const onSelectWorker = ({ id }: z.infer<typeof WorkerSchema>) => {
+    navigate(id);
   };
 
   const queryCliet = useQueryClient();

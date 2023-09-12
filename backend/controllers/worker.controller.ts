@@ -43,7 +43,7 @@ export const getWorker = async (
   try {
     const { id } = req.params;
     const worker = await Prisma.worker.findUnique({ where: { id } });
-    if (worker) throw new ExpressError("Aucun employé trouvé", 404);
+    if (!worker) throw new ExpressError("Aucun employé trouvé", 404);
     res.status(200).json(worker);
   } catch (error) {
     next(error);
@@ -58,7 +58,7 @@ export const deleteWorker = async (
   try {
     const { id } = req.params;
     const worker = await Prisma.worker.delete({ where: { id } });
-    if (worker) throw new ExpressError("Aucun employé trouvé", 404);
+    if (!worker) throw new ExpressError("Aucun employé trouvé", 404);
     res.status(200).json(worker);
   } catch (error) {
     next(error);
