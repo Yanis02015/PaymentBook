@@ -17,16 +17,43 @@ model Worker {
   lastname  String
   matricule String
   createdAt DateTime  @default(now())
-  image     String    @default("default.jpg")
-  posts     Payment[]
+  image     String    @default("default.png")
+  Vochers   Vocher[]
+  Payments  Payment[]
+}
+
+model Vocher {
+  id           String     @id @default(uuid())
+  remuneration Decimal
+  quantity     Int
+  date         DateTime   @default(now())
+  workerId     String
+  worker       Worker     @relation(fields: [workerId], references: [id])
+  typeId       String
+  type         VocherType @relation(fields: [typeId], references: [id])
+  createAt     DateTime   @default(now())
+}
+
+model VocherType {
+  id           String   @id @default(uuid())
+  name         String
+  remuneration Decimal
+  Vocher       Vocher[]
+  createAt     DateTime @default(now())
 }
 
 model Payment {
-  id        String   @id @default(uuid())
-  payment   Int
-  rest      Int      @default(0)
-  acquitted Boolean  @default(false)
-  workerId  String
-  createAt  DateTime @default(now())
-  worker    Worker   @relation(fields: [workerId], references: [id])
+  id          String   @id @default(uuid())
+  amount      Decimal
+  type        PaymentType   @default(CASH) // cash | other
+  description String?
+  workerId    String
+  worker      Worker   @relation(fields: [workerId], references: [id])
+  date        DateTime @default(now())
+  createAt    DateTime @default(now())
+}
+
+enum PaymentType {
+  CASH
+  GOODS
 }
