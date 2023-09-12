@@ -13,3 +13,5 @@ export const login = async ({
 };
 
 export const refresh = async () => await MakeRequest.get("auth/refresh").json();
+
+export const logout = async () => await MakeRequest("auth/logout").json();

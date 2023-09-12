@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ExpressError } from "../utils/error";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { Prisma } from "../configurations/db";
 
 export const createWorker = async (
   req: Request,
@@ -14,7 +12,7 @@ export const createWorker = async (
     if (!firstname || !lastname || !matricule)
       throw new ExpressError("required", 400);
 
-    const workers = await prisma.worker.create({
+    const workers = await Prisma.worker.create({
       data: { firstname, lastname, matricule },
     });
     res.status(201).json(workers);
@@ -29,7 +27,7 @@ export const getWorkers = async (
   next: NextFunction
 ) => {
   try {
-    const workers = await prisma.worker.findMany();
+    const workers = await Prisma.worker.findMany();
     if (!workers) throw new ExpressError("Aucun employé trouvé", 404);
     res.status(200).json(workers);
   } catch (error) {
@@ -44,7 +42,7 @@ export const getWorker = async (
 ) => {
   try {
     const { id } = req.params;
-    const worker = await prisma.worker.findUnique({ where: { id } });
+    const worker = await Prisma.worker.findUnique({ where: { id } });
     if (worker) throw new ExpressError("Aucun employé trouvé", 404);
     res.status(200).json(worker);
   } catch (error) {
@@ -59,7 +57,7 @@ export const deleteWorker = async (
 ) => {
   try {
     const { id } = req.params;
-    const worker = await prisma.worker.delete({ where: { id } });
+    const worker = await Prisma.worker.delete({ where: { id } });
     if (worker) throw new ExpressError("Aucun employé trouvé", 404);
     res.status(200).json(worker);
   } catch (error) {

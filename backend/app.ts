@@ -8,6 +8,7 @@ import { authRouter } from "./routes/auth.route";
 import passport from "passport";
 import { workerRouter } from "./routes/worker.route";
 import { catchError } from "./configurations/error";
+import path from "path";
 
 export const app = express();
 
@@ -17,6 +18,11 @@ app.use(expressSession);
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(
+  "/images",
+  express.static(path.join(__dirname, "../save/images/workers"))
+);
 
 app.use("/api/auth", authRouter);
 app.use("/api/workers", workerRouter);

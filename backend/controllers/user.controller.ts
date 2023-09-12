@@ -20,6 +20,18 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
   })(req, res, next);
 };
 
+export const logout = (req: Request, res: Response, next: NextFunction) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Erreur lors de la déconnexion :", err);
+      next(new ExpressError(err));
+    } else {
+      console.log("Déconnecté avec succès");
+      res.status(200).json({ message: "Déconnecté avec succès" });
+    }
+  });
+};
+
 export const refresh = (req: Request, res: Response, next: NextFunction) => {
   if (!req.isAuthenticated())
     return next(new ExpressError("You are not authenticated", 401));

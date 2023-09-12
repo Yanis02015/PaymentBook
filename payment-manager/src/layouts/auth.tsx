@@ -1,4 +1,5 @@
 import { refresh } from "@/api/auth";
+import { LogoutButton } from "@/components/my/logout";
 import { Error as ErrorComponent } from "@/components/utils/error";
 import { Loading } from "@/components/utils/loading";
 import { PATHS } from "@/utils/paths";
@@ -29,5 +30,12 @@ export default function AuthLayout() {
     return <ErrorComponent />;
   }
 
-  return <Outlet />;
+  return (
+    <div className="container">
+      <div className="flex justify-end py-4">
+        <LogoutButton />
+      </div>
+      <Outlet />
+    </div>
+  );
 }

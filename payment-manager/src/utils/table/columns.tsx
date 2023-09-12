@@ -1,8 +1,8 @@
 import { WorkerSchema as Worker } from "@/schemas/worker.schema";
 import { ColumnDef } from "@tanstack/react-table";
-import { SortedButtonColumn } from "../components/utils/table/sortedButtonColumn";
-import { TableAvatar } from "../components/utils/table/table-avatar";
 import { z } from "zod";
+import { SortedButtonColumn } from "../../components/utils/table/sortedButtonColumn";
+import { TableAvatar } from "../../components/utils/table/table-avatar";
 
 export type FunctionsWorkersColumn = {
   delete: (id: string) => void;
@@ -32,6 +32,13 @@ export const workersColumns = (): ColumnDef<z.infer<typeof Worker>>[] => [
     accessorKey: "matricule",
     header: "Matricule",
   },
+  // {
+  //   id: "actions",
+  //   cell: ({ row }) => {
+  //     const worker = row.original;
+  //     return <DropdownWorkerMenu worker={worker} />;
+  //   },
+  // },
 ];
 
 // This type is used to define the shape of our data.
