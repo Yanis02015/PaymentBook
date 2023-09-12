@@ -7,6 +7,7 @@ export const WorkerSchema = z.object({
   matricule: z.string(),
   image: z.string(),
   createdAt: z.string(),
+  fullname: z.string(),
   // Posts: PostSchema, // TODO
 });
 
