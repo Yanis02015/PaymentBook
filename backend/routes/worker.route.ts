@@ -11,4 +11,4 @@ export const workerRouter = express.Router();
 workerRouter.get("/", getWorkers);
 workerRouter.get("/:id", getWorker);
 workerRouter.post("/", createWorker);
-workerRouter.delete("/", deleteWorker);
+// workerRouter.delete("/:id", deleteWorker);

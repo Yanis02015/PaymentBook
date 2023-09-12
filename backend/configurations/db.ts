@@ -19,3 +19,4 @@ export const Prisma = new PrismaClient().$extends({
 });
 
 export const WorkerModel = Prisma.worker;
+export const VocherModel = Prisma.vocher;

@@ -7,6 +7,7 @@ import "./configurations/passport";
 import { authRouter } from "./routes/auth.route";
 import passport from "passport";
 import { workerRouter } from "./routes/worker.route";
+import { vocherRouter } from "./routes/vocher.route";
 import { catchError } from "./configurations/error";
 import path from "path";
 
@@ -26,5 +27,6 @@ app.use(
 
 app.use("/api/auth", authRouter);
 app.use("/api/workers", workerRouter);
+app.use("/api/vochers", vocherRouter);
 
 app.use(catchError);
