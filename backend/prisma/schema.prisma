@@ -28,10 +28,10 @@ model Vocher {
   quantity     Int
   date         DateTime   @default(now())
   workerId     String
-  worker       Worker     @relation(fields: [workerId], references: [id])
+  Worker       Worker     @relation(fields: [workerId], references: [id])
   typeId       String
-  type         VocherType @relation(fields: [typeId], references: [id])
-  createAt     DateTime   @default(now())
+  Type         VocherType @relation(fields: [typeId], references: [id])
+  createdAt     DateTime   @default(now())
 }
 
 model VocherType {
@@ -39,18 +39,18 @@ model VocherType {
   name         String
   remuneration Decimal
   Vocher       Vocher[]
-  createAt     DateTime @default(now())
+  createdAt     DateTime @default(now())
 }
 
 model Payment {
   id          String   @id @default(uuid())
   amount      Decimal
-  type        PaymentType   @default(CASH) // cash | other
+  Type        PaymentType   @default(CASH) // cash | other
   description String?
   workerId    String
-  worker      Worker   @relation(fields: [workerId], references: [id])
+  Worker      Worker   @relation(fields: [workerId], references: [id])
   date        DateTime @default(now())
-  createAt    DateTime @default(now())
+  createdAt    DateTime @default(now())
 }
 
 enum PaymentType {

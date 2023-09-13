@@ -31,3 +31,7 @@ export const getFormatedDate = (date: Date) => {
     distanceStrict: formatDistanceStrict(new Date(), date),
   };
 };
+
+export const formatPayment = (payment: number | string) => {
+  return payment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ".00 DA";
+};

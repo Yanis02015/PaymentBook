@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { VocherModel, WorkerModel } from "../configurations/db";
 import { ExpressError } from "../utils/error";
 import { groupVocher } from "../utils/functions";
+import { Prisma } from "@prisma/client";
 
 export const getVochers = async (
   req: Request,

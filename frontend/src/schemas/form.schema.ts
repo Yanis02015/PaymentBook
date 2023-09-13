@@ -20,3 +20,13 @@ export const WorkerFormSchema = z.object({
     message: "La matricule du travailleur ne peux pas être vide.",
   }),
 });
+
+export const VocherFormSchema = z.object({
+  remuneration: z
+    .number()
+    .min(500, "La rémunération du bon ne peut pas être inferieur à 500 DA."),
+  quantity: z.number().min(0, "Le nombre de bon ne peut pas être zéro."),
+  workerId: z.string(),
+  typeId: z.string(),
+  date: z.string(),
+});

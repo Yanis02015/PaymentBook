@@ -11,24 +11,35 @@ import {
 } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
+import { z } from "zod";
+import { VochersPerMonthSchema } from "@/schemas/vocher.schema";
+import { WorkerSchema } from "@/schemas/worker.schema";
+import { formatPayment } from "@/utils/functions";
 
-export const PaymentMonthCard = () => (
+export const PaymentMonthCard = ({
+  vocherPerMonth,
+  worker,
+}: {
+  vocherPerMonth: z.infer<typeof VochersPerMonthSchema>;
+  worker: z.infer<typeof WorkerSchema>;
+}) => (
   <Card>
     <CardHeader>
-      <CardTitle>Janvier 2023</CardTitle>
+      <CardTitle>{vocherPerMonth.month}</CardTitle>
       <CardDescription>
-        Les transaction du mois de Janvier pour Mr. Yanis Oulhaci.
+        Les transaction du mois de {vocherPerMonth.month} pour Mr.{" "}
+        {worker.fullname}
       </CardDescription>
     </CardHeader>
     <CardContent>
       <p className="text-sm font-semibold text-muted-foreground">
-        LISTE DES VERSSEMENTS DU MOIS
+        LISTE DES VERSSEMENTS
       </p>
       <Carousel slideMargin="5px" totalSlides={30} step={1}>
         <Slider>
-          {new Array(30).fill(0).map((_, i) => (
+          {new Array(10).fill(0).map((_, i) => (
             <Slide key={i} style={{ width: "max-content" }}>
-              <Badge>{i} step</Badge>
+              <Badge>{i * 40 + 1200} DA</Badge>
             </Slide>
           ))}
         </Slider>
@@ -42,7 +53,9 @@ export const PaymentMonthCard = () => (
         <Separator className="h-full hidden sm:block" orientation="vertical" />
         <Separator className="w-20 sm:hidden block" orientation="horizontal" />
         <div>
-          <h3 className="text-xl font-semibold">14 000.00 DA</h3>
+          <h3 className="text-xl font-semibold">
+            {formatPayment(vocherPerMonth.total)}
+          </h3>
           <p className="font-semibold">Total</p>
         </div>
         <Separator className="h-full hidden sm:block" orientation="vertical" />
