@@ -38,7 +38,7 @@ export default function Worker() {
       <div className="py-3"></div>
       {worker && vochers && (
         <div className={cn("flex flex-col-reverse gap-4", "md:flex-row")}>
-          <div className="flex-1 max-w-full md:pt-16 overflow-hidden space-y-4 relative">
+          <div className="flex-1 max-w-full md:pt-16 overflow-hidden space-y-8 relative">
             {vochers?.map((vocher) => (
               <PaymentMonthCard
                 key={vocher.month}
