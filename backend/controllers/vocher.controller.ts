@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { VocherModel, WorkerModel } from "../configurations/db";
+import { PaymentModel, VocherModel, WorkerModel } from "../configurations/db";
 import { ExpressError } from "../utils/error";
 import { groupVocher } from "../utils/functions";
 import { Prisma } from "@prisma/client";
@@ -46,7 +46,10 @@ export const getWorkerVochers = async (
     if (!vochers) return next(new ExpressError("Aucun bon trouvé", 404));
 
     const { group } = req.query;
-    if (group == "month") return res.status(200).json(groupVocher(vochers));
+    if (group == "month") {
+      const payments = await PaymentModel.findMany({ where: { workerId } });
+      return res.status(200).json(groupVocher(vochers, payments));
+    }
 
     res.status(200).json(vochers);
   } catch (error) {

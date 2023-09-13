@@ -37,9 +37,7 @@ export const formatPayment = (payment: number | string) => {
   return (
     payment
       .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-      .split(".")[0] + ",00 DA"
+      .replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0")
+      .split(".")[0] + ",00\u00A0DA"
   );
-  const a = 1;
-  a.toLocaleString;
 };

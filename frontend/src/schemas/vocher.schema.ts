@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { WorkerSchema } from "./worker.schema";
+import { PaymentsSchema } from "./payment.schema";
 
 export const VocherTypeSchepa = z.object({
   id: z.string(),
@@ -29,6 +30,7 @@ export const VochersPerMonthSchema = z.object({
   pay: z.number(),
   rest: z.number(),
   Vochers: VochersSchema,
+  Payments: PaymentsSchema,
 });
 
 export const VochersPerMonthsSchema = z.array(VochersPerMonthSchema);

@@ -40,13 +40,11 @@ export default function Worker() {
         <div className={cn("flex flex-col-reverse gap-4", "md:flex-row")}>
           <div className="flex-1 max-w-full md:pt-16 overflow-hidden space-y-4 relative">
             {vochers?.map((vocher) => (
-              <>
-                <PaymentMonthCard
-                  key={vocher.month}
-                  vocherPerMonth={vocher}
-                  worker={worker}
-                />
-              </>
+              <PaymentMonthCard
+                key={vocher.month}
+                vocherPerMonth={vocher}
+                worker={worker}
+              />
             ))}
           </div>
           <h2 className="text-md font-semibold md:hidden mt-10">

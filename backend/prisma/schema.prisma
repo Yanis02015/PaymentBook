@@ -45,7 +45,7 @@ model VocherType {
 model Payment {
   id          String   @id @default(uuid())
   amount      Decimal
-  Type        PaymentType   @default(CASH) // cash | other
+  type        PaymentType   @default(CASH) // cash | other
   description String?
   workerId    String
   Worker      Worker   @relation(fields: [workerId], references: [id])

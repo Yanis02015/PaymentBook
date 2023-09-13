@@ -58,34 +58,40 @@ export const PaymentMonthCard = ({
       <p className="text-sm font-semibold text-muted-foreground mt-5">
         LISTE DES VERSSEMENTS
       </p>
-      <Carousel slideMargin="5px" totalSlides={7} step={1}>
-        <Slider>
-          {new Array(7).fill(0).map((_, i) => (
-            <Slide key={i} style={{ width: "max-content" }}>
-              <Badge variant="outline">{i * 40 + 1200} DA</Badge>
-            </Slide>
-          ))}
-        </Slider>
-      </Carousel>
+      {vocherPerMonth.Payments && vocherPerMonth.Payments.length > 0 ? (
+        <Carousel slideMargin="5px" totalSlides={7} step={1}>
+          <Slider>
+            {vocherPerMonth.Payments.map((payment) => (
+              <Slide key={payment.id} style={{ width: "max-content" }}>
+                <Badge variant="outline">{payment.amount} DA</Badge>
+              </Slide>
+            ))}
+          </Slider>
+        </Carousel>
+      ) : (
+        <Badge variant="secondary" className="text-slate-500 rounded">
+          Aucun verssement pour ce mois
+        </Badge>
+      )}
 
-      <div className="mt-5 sm:h-10 h-[auto] sm:flex-row flex-col justify-between flex items-center gap-x-4 gap-y-3 text-center flex-wrap">
-        <div>
+      <div className="mt-5 h-[auto] sm:flex-row flex-col justify-between flex items-center gap-x-4 gap-y-3 text-center flex-wrap">
+        <div className="flex-1">
           <h3 className="text-xl font-semibold xl:text-3xl md:text-2xl text-green-400">
             {formatPayment(vocherPerMonth.pay)}
           </h3>
           <p className="font-semibold">Versé</p>
         </div>
-        <Separator className="h-full hidden sm:block" orientation="vertical" />
+        <Separator className="h-10 hidden sm:block" orientation="vertical" />
         <Separator className="w-20 sm:hidden block" orientation="horizontal" />
-        <div>
+        <div className="flex-1">
           <h3 className="text-xl font-semibold xl:text-3xl md:text-2xl">
             {formatPayment(vocherPerMonth.total)}
           </h3>
           <p className="font-semibold">Total</p>
         </div>
-        <Separator className="h-full hidden sm:block" orientation="vertical" />
+        <Separator className="h-10 hidden sm:block" orientation="vertical" />
         <Separator className="w-20 sm:hidden block" orientation="horizontal" />
-        <div>
+        <div className="flex-1">
           <h3 className="text-xl font-semibold xl:text-3xl md:text-2xl text-destructive">
             {formatPayment(vocherPerMonth.rest)}
           </h3>
