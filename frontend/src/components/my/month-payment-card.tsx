@@ -33,27 +33,52 @@ export const PaymentMonthCard = ({
     </CardHeader>
     <CardContent>
       <p className="text-sm font-semibold text-muted-foreground">
-        LISTE DES VERSSEMENTS
+        LISTE DES BONS
       </p>
-      <Carousel slideMargin="5px" totalSlides={30} step={1}>
+      <Carousel
+        slideMargin="5px"
+        totalSlides={vocherPerMonth.Vochers.length}
+        step={1}
+      >
         <Slider>
-          {new Array(10).fill(0).map((_, i) => (
-            <Slide key={i} style={{ width: "max-content" }}>
-              <Badge>{i * 40 + 1200} DA</Badge>
+          {vocherPerMonth.Vochers.map((vocher) => (
+            <Slide key={vocher.id} style={{ width: "max-content" }}>
+              <Badge>
+                {vocher.quantity}
+                <span className="text-destructive mx-1">x</span>
+                {formatPayment(vocher.remuneration)}
+                <span className="text-destructive mx-1">~</span>
+                {vocher.Type?.name}
+              </Badge>
             </Slide>
           ))}
         </Slider>
       </Carousel>
 
-      <div className="mt-5 h-10 sm:flex-row flex-col justify-between flex items-center gap-x-4 gap-y-3 text-center flex-wrap">
+      <p className="text-sm font-semibold text-muted-foreground mt-5">
+        LISTE DES VERSSEMENTS
+      </p>
+      <Carousel slideMargin="5px" totalSlides={7} step={1}>
+        <Slider>
+          {new Array(7).fill(0).map((_, i) => (
+            <Slide key={i} style={{ width: "max-content" }}>
+              <Badge variant="outline">{i * 40 + 1200} DA</Badge>
+            </Slide>
+          ))}
+        </Slider>
+      </Carousel>
+
+      <div className="mt-5 sm:h-10 h-[auto] sm:flex-row flex-col justify-between flex items-center gap-x-4 gap-y-3 text-center flex-wrap">
         <div>
-          <h3 className="text-xl font-semibold text-green-400">13 000.00 DA</h3>
+          <h3 className="text-xl font-semibold xl:text-3xl md:text-2xl text-green-400">
+            13 000.00 DA
+          </h3>
           <p className="font-semibold">Versé</p>
         </div>
         <Separator className="h-full hidden sm:block" orientation="vertical" />
         <Separator className="w-20 sm:hidden block" orientation="horizontal" />
         <div>
-          <h3 className="text-xl font-semibold">
+          <h3 className="text-xl font-semibold xl:text-3xl md:text-2xl">
             {formatPayment(vocherPerMonth.total)}
           </h3>
           <p className="font-semibold">Total</p>
@@ -61,7 +86,7 @@ export const PaymentMonthCard = ({
         <Separator className="h-full hidden sm:block" orientation="vertical" />
         <Separator className="w-20 sm:hidden block" orientation="horizontal" />
         <div>
-          <h3 className="text-xl font-semibold text-destructive">
+          <h3 className="text-xl font-semibold xl:text-3xl md:text-2xl text-destructive">
             1 000.00 DA
           </h3>
           <p className="font-semibold">Reste</p>

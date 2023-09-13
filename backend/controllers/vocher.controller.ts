@@ -39,7 +39,10 @@ export const getWorkerVochers = async (
 ) => {
   try {
     const { workerId } = req.params;
-    const vochers = await VocherModel.findMany({ where: { workerId } });
+    const vochers = await VocherModel.findMany({
+      where: { workerId },
+      include: { Type: true },
+    });
     if (!vochers) return next(new ExpressError("Aucun bon trouvé", 404));
 
     const { group } = req.query;
@@ -47,6 +50,8 @@ export const getWorkerVochers = async (
 
     res.status(200).json(vochers);
   } catch (error) {
+    console.log(error);
+
     next(error);
   }
 };
