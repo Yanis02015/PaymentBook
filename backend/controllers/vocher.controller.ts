@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { VocherModel, WorkerModel } from "../configurations/db";
 import { ExpressError } from "../utils/error";
+import { groupVocher } from "../utils/functions";
 
 export const getVochers = async (
   req: Request,
@@ -26,6 +27,24 @@ export const getVocher = async (
     if (!vocher) return next(new ExpressError("Aucun bon trouvé", 404));
 
     res.status(200).json(vocher);
+  } catch (error) {
+    next(error);
+  }
+};
+export const getWorkerVochers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { workerId } = req.params;
+    const vochers = await VocherModel.findMany({ where: { workerId } });
+    if (!vochers) return next(new ExpressError("Aucun bon trouvé", 404));
+
+    const { group } = req.query;
+    if (group == "month") return res.status(200).json(groupVocher(vochers));
+
+    res.status(200).json(vochers);
   } catch (error) {
     next(error);
   }

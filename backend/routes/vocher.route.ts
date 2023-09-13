@@ -3,11 +3,13 @@ import {
   createVocher,
   getVochers,
   getVocher,
+  getWorkerVochers,
 } from "../controllers/vocher.controller";
 
 export const vocherRouter = express.Router();
 
 vocherRouter.get("/", getVochers);
 vocherRouter.get("/:id", getVocher);
+vocherRouter.get("/worker/:workerId", getWorkerVochers);
 vocherRouter.post("/", createVocher);
 // vocherRouter.delete("/:id", deleteVocher);
