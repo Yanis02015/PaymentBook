@@ -33,5 +33,13 @@ export const getFormatedDate = (date: Date) => {
 };
 
 export const formatPayment = (payment: number | string) => {
-  return payment.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ".00 DA";
+  payment = payment.toString().split(".")[0].split(",")[0];
+  return (
+    payment
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+      .split(".")[0] + ",00 DA"
+  );
+  const a = 1;
+  a.toLocaleString;
 };

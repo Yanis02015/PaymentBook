@@ -71,7 +71,7 @@ export const PaymentMonthCard = ({
       <div className="mt-5 sm:h-10 h-[auto] sm:flex-row flex-col justify-between flex items-center gap-x-4 gap-y-3 text-center flex-wrap">
         <div>
           <h3 className="text-xl font-semibold xl:text-3xl md:text-2xl text-green-400">
-            13 000.00 DA
+            {formatPayment(vocherPerMonth.pay)}
           </h3>
           <p className="font-semibold">Versé</p>
         </div>
@@ -87,13 +87,13 @@ export const PaymentMonthCard = ({
         <Separator className="w-20 sm:hidden block" orientation="horizontal" />
         <div>
           <h3 className="text-xl font-semibold xl:text-3xl md:text-2xl text-destructive">
-            1 000.00 DA
+            {formatPayment(vocherPerMonth.rest)}
           </h3>
           <p className="font-semibold">Reste</p>
         </div>
       </div>
     </CardContent>
-    <CardFooter className="justify-end">
+    <CardFooter className="justify-end pt-5">
       <Button variant="outline" size="sm">
         <DollarSign className="h-4 w-4 mr-1" /> Nouveau verssement
       </Button>
