@@ -1,5 +1,6 @@
 import { getWorker } from "@/api/worker";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { PaymentMonthCard } from "@/components/my/month-payment-card";
+import { WorkerProfil } from "@/components/my/worker-profil";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PATHS } from "@/utils/paths";
@@ -29,28 +30,21 @@ export default function Worker() {
       </Link>
       <div className="py-3"></div>
       {worker && (
-        <div className="flex gap-4 items-center">
-          <div className="w-44">
-            <AspectRatio ratio={1} className="rounded-full">
-              <img
-                src={worker.image}
-                alt="Photo by Drew Beamer"
-                className="rounded-md object-cover w-full h-full"
-              />
-            </AspectRatio>
+        <div className={cn("flex flex-col-reverse gap-4", "md:flex-row")}>
+          <div className="flex-1 max-w-full md:pt-16 overflow-hidden space-y-4 relative">
+            <PaymentMonthCard />
+            <PaymentMonthCard />
+            <PaymentMonthCard />
+            <PaymentMonthCard />
           </div>
-          <div className="text-xl">
-            <ul>
-              <li>
-                Nom: <strong>{worker.firstname}</strong>
-              </li>
-              <li>
-                Prénom: <strong>{worker.lastname}</strong>
-              </li>
-              <li>
-                Matricule: <strong>{worker.matricule}</strong>
-              </li>
-            </ul>
+          <h2 className="text-md font-semibold md:hidden mt-10">
+            Les verssements de l'année 2023
+          </h2>
+          <div className="relative w-full md:w-[300px] md:w-full md:h-screen">
+            <WorkerProfil
+              worker={worker}
+              className="h-fit sticky top-20 w-full w-full md:w-[300px] md:w-full"
+            />
           </div>
         </div>
       )}
