@@ -6,9 +6,13 @@ export const WorkerSchema = z.object({
   lastname: z.string(),
   matricule: z.string(),
   image: z.string(),
-  createdAt: z.string(),
+  createdAt: z.coerce.date(),
   fullname: z.string(),
   // Posts: PostSchema, // TODO
+  address: z.string().nullable(),
+  phonenumber: z.string().nullable(),
+  email: z.string().nullable(),
+  birthdate: z.coerce.date().nullable(),
 });
 
 export const WorkersSchema = z.array(WorkerSchema);

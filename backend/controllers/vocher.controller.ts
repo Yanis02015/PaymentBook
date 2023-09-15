@@ -1,8 +1,13 @@
 import { NextFunction, Request, Response } from "express";
-import { PaymentModel, VocherModel, WorkerModel } from "../configurations/db";
+import {
+  PaymentModel,
+  VocherModel,
+  VocherTypeModel,
+  WorkerModel,
+} from "../configurations/db";
 import { ExpressError } from "../utils/error";
-import { groupVocher } from "../utils/functions";
-import { Prisma } from "@prisma/client";
+import { getMonthLimits, groupVocher } from "../utils/functions";
+import { Prisma, Vocher } from "@prisma/client";
 
 export const getVochers = async (
   req: Request,
@@ -42,12 +47,20 @@ export const getWorkerVochers = async (
     const vochers = await VocherModel.findMany({
       where: { workerId },
       include: { Type: true },
+      orderBy: {
+        createdAt: "asc",
+      },
     });
     if (!vochers) return next(new ExpressError("Aucun bon trouvé", 404));
 
     const { group } = req.query;
     if (group == "month") {
-      const payments = await PaymentModel.findMany({ where: { workerId } });
+      const payments = await PaymentModel.findMany({
+        where: { workerId },
+        orderBy: {
+          createdAt: "asc",
+        },
+      });
       return res.status(200).json(groupVocher(vochers, payments));
     }
 
@@ -79,9 +92,39 @@ export const createVocher = async (
     const worker = await WorkerModel.findFirst({ where: { id: workerId } });
     if (!worker) return next(new ExpressError("Aucun travailleur trouvé", 404));
 
-    const vochers = await VocherModel.create(req.body);
+    const vochers = await VocherModel.create({ data: req.body });
     res.status(200).json(vochers);
   } catch (error) {
     next(error);
   }
+};
+
+export const getVocherTypes = async (
+  _: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const types = await VocherTypeModel.findMany();
+    res.status(200).json(types);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getVochersOfMonth = async (
+  workerId: string,
+  date: Date
+): Promise<Vocher[]> => {
+  const { begin, end } = getMonthLimits(date);
+
+  return await VocherModel.findMany({
+    where: {
+      workerId,
+      date: {
+        gte: begin,
+        lte: end,
+      },
+    },
+  });
 };

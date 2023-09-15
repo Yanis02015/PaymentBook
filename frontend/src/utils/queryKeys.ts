@@ -4,4 +4,6 @@ export const queries = {
   loggedIn: "loggedIn",
   workers: "workers",
   vocherPerMonth: "vocherPerMonth",
+  vocherTypes: "vocherTypes",
+  payments: "payments",
 };

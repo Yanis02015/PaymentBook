@@ -22,11 +22,24 @@ export const WorkerFormSchema = z.object({
 });
 
 export const VocherFormSchema = z.object({
-  remuneration: z
+  remuneration: z.coerce
     .number()
     .min(500, "La rémunération du bon ne peut pas être inferieur à 500 DA."),
-  quantity: z.number().min(0, "Le nombre de bon ne peut pas être zéro."),
-  workerId: z.string(),
+  quantity: z.coerce.number().min(1, "Le nombre de bon ne peut pas être zéro."),
+  workerId: z.string().optional(),
   typeId: z.string(),
-  date: z.string(),
+  date: z.date(),
+});
+
+export const PaymentForMonthSchema = z.object({
+  amount: z.coerce
+    .number()
+    .min(1000, "La somme du versement doit être superieur à 1 000 DA"),
+  type: z.enum(["CASH", "GOODS"]),
+  description: z
+    .string()
+    .max(140, "La description est limité à 140 caractères")
+    .nullable(),
+  workerId: z.string(),
+  month: z.coerce.date(),
 });

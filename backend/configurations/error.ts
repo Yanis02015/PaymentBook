@@ -7,6 +7,8 @@ export const catchError = (
   res: Response,
   _next: NextFunction
 ) => {
+  console.log(err);
+
   const statusCode = err.statusCode || 500; // Utilisez 500 si aucun statut n'est défini
   const message = err.message || "Erreur interne du serveur";
 

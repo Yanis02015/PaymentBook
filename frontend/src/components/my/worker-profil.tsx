@@ -1,9 +1,17 @@
+import { createVocher } from "@/api/vocher";
+import { cn } from "@/lib/utils";
 import { WorkerSchema } from "@/schemas/worker.schema";
+import { queries } from "@/utils/queryKeys";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { DollarSign, LineChart, Pen, Plus } from "lucide-react";
+import { useState } from "react";
 import { z } from "zod";
 import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
-import { LineChart, Pen, Plus } from "lucide-react";
+import { CreateVocherDialog } from "./create-vocher-dialog";
+import { useToast } from "../ui/use-toast";
+import { NotFoundBadge } from "./not-found-badge";
+import { getFormatedDate } from "@/utils/functions";
 
 const profilElementClassName =
   "bg-slate-100 flex justify-between text-sm items-center p-2 rounded-lg";
@@ -15,6 +23,22 @@ export const WorkerProfil = ({
   worker: z.infer<typeof WorkerSchema>;
   className?: string;
 }) => {
+  const queryClient = useQueryClient();
+
+  const [dialogVisibility, setDialogVisibility] = useState(false);
+
+  const { toast } = useToast();
+  const mutationCreateVocher = useMutation({
+    mutationFn: createVocher,
+    onSuccess: () => {
+      queryClient.invalidateQueries([queries.vocherPerMonth]);
+      setDialogVisibility(false);
+      toast({
+        title: "Mission crée avec succès!",
+        description: `La nouvelle mission du ${worker.fullname} a été crée avec succès.`,
+      });
+    },
+  });
   return (
     <div className={cn(className)}>
       <div
@@ -40,30 +64,62 @@ export const WorkerProfil = ({
         <div className="space-y-2">
           <div className={profilElementClassName}>
             <strong>Adresse:</strong>
-            <span>Ighil Ouazoug Béjaia</span>
+            <span>{worker.address || <NotFoundBadge />}</span>
           </div>
           <div className={profilElementClassName}>
             <strong>Tél:</strong>
-            <span>0541494361</span>
+            <span>{worker.phonenumber || <NotFoundBadge />}</span>
           </div>
           <div className={profilElementClassName}>
-            <strong>Tél:</strong>
-            <span>0541494361</span>
+            <strong>Email:</strong>
+            <span>{worker.email || <NotFoundBadge />}</span>
+          </div>
+          <div className={profilElementClassName}>
+            <strong>D. Naissance:</strong>
+            <span>
+              {worker.birthdate ? (
+                getFormatedDate(worker.birthdate).fullDate
+              ) : (
+                <NotFoundBadge />
+              )}
+            </span>
           </div>
         </div>
         <Button variant="outline-green" size="lg">
-          <Pen size={17} className="mr-2" /> Modifier le profil
+          <Pen size={17} className="mr-3" /> Modifier le profil
         </Button>
       </div>
-      <div className="space-y-2 pt-3">
-        <Button size="sm" className="w-full">
-          <Plus size={17} className="mr-2" /> Ajouter une mission
+      <div className="space-y-2 pt-3 relative">
+        <Button
+          onClick={() => setDialogVisibility(true)}
+          size="sm"
+          className="w-full"
+        >
+          <Plus size={17} className="absolute left-4" /> Ajouter une mission
         </Button>
-        <Button variant="outline" size="sm" className="w-full">
-          <LineChart size={17} className="float-left" />
+        <Button
+          size="sm"
+          className="w-full bg-blue-400 hover:bg-blue-400/90 cursor-not-allowed"
+        >
+          <DollarSign size={17} className="absolute left-4" />
+          <p>Effectuer un versement</p>
+        </Button>
+        <div></div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full cursor-not-allowed"
+        >
+          <LineChart size={17} className="absolute left-4" />
           <p>Voir les statistique</p>
         </Button>
       </div>
+      <CreateVocherDialog
+        onOpenChange={setDialogVisibility}
+        onSubmit={mutationCreateVocher.mutate}
+        open={dialogVisibility}
+        worker={worker}
+      />
     </div>
   );
 };

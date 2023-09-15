@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { MakeRequest } from "./config";
-import { VochersPerMonthsSchema, VochersSchema } from "@/schemas/vocher.schema";
+import {
+  VocherTypesSchema,
+  VochersPerMonthsSchema,
+  VochersSchema,
+} from "@/schemas/vocher.schema";
 import { VocherFormSchema } from "@/schemas/form.schema";
 
 export const getVochers = async () =>
@@ -13,3 +17,6 @@ export const getWorkerVochers = async (workerId: string) =>
 
 export const createVocher = async (vocher: z.infer<typeof VocherFormSchema>) =>
   await MakeRequest.post("vochers", { json: vocher }).json();
+
+export const getVocherTypes = async () =>
+  await MakeRequest("vochers/types").json().then(VocherTypesSchema.parse);

@@ -10,6 +10,7 @@ import { workerRouter } from "./routes/worker.route";
 import { vocherRouter } from "./routes/vocher.route";
 import { catchError } from "./configurations/error";
 import path from "path";
+import { paymentRouter } from "./routes/payment.route";
 
 export const app = express();
 
@@ -28,5 +29,6 @@ app.use(
 app.use("/api/auth", authRouter);
 app.use("/api/workers", workerRouter);
 app.use("/api/vochers", vocherRouter);
+app.use("/api/payments", paymentRouter);
 
 app.use(catchError);

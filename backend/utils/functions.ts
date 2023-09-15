@@ -20,7 +20,7 @@ export const groupVocher = (
   const vocherPerMonth: VocherPerMonth = [];
 
   vochers.forEach((vocher) => {
-    let moisAnnee = formatMonthYearName(vocher.date);
+    let moisAnnee = formatMonthYearName(getMonthLimits(vocher.date).begin);
     const index = vocherPerMonth.findIndex((v) => v.month == moisAnnee);
 
     if (index == -1) {
@@ -39,14 +39,14 @@ export const groupVocher = (
   });
 
   payements.forEach((payment) => {
-    let moisAnnee = formatMonthYearName(payment.date);
+    let moisAnnee = formatMonthYearName(payment.month);
 
     const index = vocherPerMonth.findIndex((v) => v.month == moisAnnee);
 
     if (index == -1) {
       vocherPerMonth.push({
         month: moisAnnee,
-        date: payment.date,
+        date: payment.month,
         pay: 0,
         rest: 0,
         total: 0,
@@ -64,7 +64,9 @@ export const groupVocher = (
   return vocherPerMonth.map((monthVocher) => {
     let total = 0;
     let pay = 0;
-    monthVocher.Vochers.forEach((v) => (total += v.remuneration.toNumber()));
+    monthVocher.Vochers.forEach(
+      (v) => (total += v.remuneration.toNumber() * v.quantity)
+    );
     monthVocher.Payments.forEach((p) => (pay += p.amount.toNumber()));
     monthVocher.total = total;
     monthVocher.pay = pay;
@@ -79,4 +81,21 @@ const formatMonthYearName = (date: Date) => {
   })} ${date.getFullYear()}`;
 
   return moisAnnee.charAt(0).toUpperCase() + moisAnnee.slice(1);
+};
+
+export const getMonthLimits = (date: Date) => {
+  const dateRecherchee = new Date(date);
+  const anneeRecherchee = dateRecherchee.getFullYear();
+  const moisRecherche = dateRecherchee.getMonth();
+
+  // Créer une date de début de mois
+  const begin = new Date(anneeRecherchee, moisRecherche, 1);
+
+  // Trouver le dernier jour du mois suivant (pour obtenir la fin du mois actuel)
+  const end = new Date(anneeRecherchee, moisRecherche + 1, 0);
+
+  return {
+    begin,
+    end,
+  };
 };

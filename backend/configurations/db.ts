@@ -21,3 +21,4 @@ export const Prisma = new PrismaClient().$extends({
 export const WorkerModel = Prisma.worker;
 export const VocherModel = Prisma.vocher;
 export const PaymentModel = Prisma.payment;
+export const VocherTypeModel = Prisma.vocherType;

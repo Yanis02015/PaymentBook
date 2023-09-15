@@ -25,10 +25,19 @@ export const getFormatedDate = (date: Date) => {
   const hourse = format(date, "HH", { locale: fr });
   const minutes = format(date, "mm", { locale: fr });
 
+  const fullDate = format(date, "P", { locale: fr });
+  const fullMonth = format(date, "MMMM", { locale: fr });
+  const year = format(date, "uuuu", { locale: fr });
+  const monthYear = `${fullMonth} ${year}`;
+
   return {
     simpleDateWithDayWeek: `${dayOfWeek} ${dayInMonth}, ${month}`,
     simpleTime: `${hourse}:${minutes}`,
     distanceStrict: formatDistanceStrict(new Date(), date),
+    fullDate,
+    fullMonth,
+    monthYear,
+    year,
   };
 };
 
