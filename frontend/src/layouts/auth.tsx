@@ -6,7 +6,7 @@ import { PATHS } from "@/utils/paths";
 import { queries } from "@/utils/queryKeys";
 import { useQuery } from "@tanstack/react-query";
 import { HTTPError } from "ky";
-import { Link, Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
 export default function AuthLayout() {
   const { isError, isLoading, error } = useQuery({
@@ -21,13 +21,15 @@ export default function AuthLayout() {
   if (isError) {
     if (error instanceof HTTPError && error.response.status === 401)
       return (
-        <>
-          Vous n'êtes pas autorisé, vuillez vous authentifier d'abord.{" "}
-          <Link to={PATHS.LOGIN}>Se connecter</Link>
-        </>
+        // TODO: A good component to tel login
+        // <>
+        //   Vous n'êtes pas autorisé, vuillez vous authentifier d'abord.{" "}
+        //   <Link to={PATHS.LOGIN}>Se connecter</Link>
+        // </>
+        <Navigate to={PATHS.LOGIN} />
       );
 
-    return <ErrorComponent />;
+    return <ErrorComponent className="pt-20" />;
   }
 
   return (

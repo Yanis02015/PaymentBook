@@ -10,8 +10,8 @@ import { VocherFormSchema } from "@/schemas/form.schema";
 export const getVochers = async () =>
   await MakeRequest.get("vochers").json().then(VochersSchema.parse);
 
-export const getWorkerVochers = async (workerId: string) =>
-  await MakeRequest.get(`vochers/worker/${workerId}?group=month`)
+export const getWorkerVochers = async (workerId: string, year: number) =>
+  await MakeRequest.get(`vochers/worker/${workerId}?group=month&year=${year}`)
     .json()
     .then(VochersPerMonthsSchema.parse);
 

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ExpressError } from "../utils/error";
-import { Prisma } from "../configurations/db";
+import { Prisma, WorkerModel } from "../configurations/db";
 
 export const createWorker = async (
   req: Request,
@@ -63,4 +63,47 @@ export const deleteWorker = async (
   } catch (error) {
     next(error);
   }
+};
+
+export const getMissionsYears = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { workerId } = req.params;
+    if (!workerId) throw new ExpressError("Aucun travailleur selectionné", 400);
+
+    const worker = await WorkerModel.findFirst({ where: { id: workerId } });
+    if (!worker) throw new ExpressError("Travailleur non trouvé", 404);
+
+    const years = await getYearsWorkerJob(workerId);
+    const castedYears = years.map((y) => ({
+      ...y,
+      vochers: parseInt(y.vochers.toString(), 10),
+    }));
+
+    res.status(200).json(castedYears);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Function
+export const getYearsWorkerJob = async (
+  workerId: string
+): Promise<{ year: number; vochers: bigint }[]> => {
+  return await Prisma.$queryRaw`
+  SELECT 
+    EXTRACT(YEAR FROM date) as year,
+    COUNT(*) as vochers
+  FROM 
+    Vocher
+  WHERE
+    workerId=${workerId}
+  GROUP BY 
+    year
+  ORDER BY 
+    year DESC;
+`;
 };

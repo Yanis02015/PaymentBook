@@ -22,6 +22,8 @@ const buttonVariants = cva(
           "border-2 border-green-400 bg-transparent hover:bg-green-400 text-green-400 hover:text-white transition font-normal",
         "outline-blue":
           "border-2 border-blue-400 bg-transparent hover:bg-blue-400 text-blue-400 hover:text-white transition font-normal",
+        "outline-blue-active":
+          "border-2 border-blue-500 bg-blue-500 hover:bg-blue-400 hover:border-blue-400 text-white transition font-normal",
       },
       size: {
         default: "h-10 px-4 py-2",

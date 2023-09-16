@@ -99,3 +99,14 @@ export const getMonthLimits = (date: Date) => {
     end,
   };
 };
+
+export const getYearLimits = (year: string) => {
+  const yearNbr = Number(year);
+  if (!yearNbr) return;
+  return {
+    gte: getBeginOfYear(yearNbr),
+    lt: getBeginOfYear(yearNbr + 1),
+  };
+};
+
+export const getBeginOfYear = (year: number) => new Date(year, 0, 1);

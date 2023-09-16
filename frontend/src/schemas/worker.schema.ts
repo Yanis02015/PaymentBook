@@ -16,3 +16,10 @@ export const WorkerSchema = z.object({
 });
 
 export const WorkersSchema = z.array(WorkerSchema);
+
+export const YearsWorkerSchema = z.array(
+  z.object({
+    year: z.number(),
+    vochers: z.coerce.number(),
+  })
+);

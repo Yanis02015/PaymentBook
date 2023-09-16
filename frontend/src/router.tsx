@@ -1,24 +1,15 @@
-import { Link, Navigate, createBrowserRouter } from "react-router-dom";
-import { PATHS } from "./utils/paths";
-import Login from "./pages/Login";
+import { Navigate, createBrowserRouter } from "react-router-dom";
 import AuthLayout from "./layouts/auth";
-import Workers from "./pages/Workers";
+import Login from "./pages/Login";
 import Worker from "./pages/Worker";
+import Workers from "./pages/Workers";
+import { PATHS } from "./utils/paths";
 
 export const router = () =>
   createBrowserRouter([
     {
       path: PATHS.HOME,
-      element: (
-        <ul>
-          <li>
-            Dashboard : <Link to={PATHS.DASHBOARD}>{PATHS.DASHBOARD}</Link>
-          </li>
-          <li>
-            Payments : <Link to={PATHS.PAYMENTS}>{PATHS.PAYMENTS}</Link>
-          </li>
-        </ul>
-      ),
+      element: <Navigate to={PATHS.DASHBOARD} />,
     },
     {
       path: PATHS.LOGIN,

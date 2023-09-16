@@ -1,13 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import {
   PaymentModel,
+  Prisma,
   VocherModel,
   VocherTypeModel,
   WorkerModel,
 } from "../configurations/db";
 import { ExpressError } from "../utils/error";
-import { getMonthLimits, groupVocher } from "../utils/functions";
-import { Prisma, Vocher } from "@prisma/client";
+import { getMonthLimits, getYearLimits, groupVocher } from "../utils/functions";
+import { Vocher } from "@prisma/client";
 
 export const getVochers = async (
   req: Request,
@@ -37,6 +38,7 @@ export const getVocher = async (
     next(error);
   }
 };
+
 export const getWorkerVochers = async (
   req: Request,
   res: Response,
@@ -44,19 +46,25 @@ export const getWorkerVochers = async (
 ) => {
   try {
     const { workerId } = req.params;
+    const { year } = req.query;
+    const date = getYearLimits(year as string);
     const vochers = await VocherModel.findMany({
-      where: { workerId },
+      where: {
+        workerId,
+        date, // This is not createdAt
+      },
       include: { Type: true },
       orderBy: {
         createdAt: "asc",
       },
     });
+
     if (!vochers) return next(new ExpressError("Aucun bon trouvé", 404));
 
     const { group } = req.query;
     if (group == "month") {
       const payments = await PaymentModel.findMany({
-        where: { workerId },
+        where: { workerId, month: date },
         orderBy: {
           createdAt: "asc",
         },
@@ -112,6 +120,7 @@ export const getVocherTypes = async (
   }
 };
 
+// Function
 export const getVochersOfMonth = async (
   workerId: string,
   date: Date
