@@ -1,0 +1,60 @@
+name: 🚀 Deploy website on push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+
+      - name: Install PNPM
+        run: npm install -g pnpm
+
+      - name: Install Dependencies with PNPM for backend
+        run: |
+          cd backend
+          pnpm install
+
+      - name: Install Dependencies with PNPM for frontend
+        run: |
+          cd frontend
+          pnpm install
+
+      - name: Compile Backend Typescript
+        run: |
+          cd backend
+          pnpm run build
+
+      - name: Create .env File
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "SHADOW_DATABASE_URL=${{ secrets.SHADOW_DATABASE_URL }}" >> .env
+
+      - name: Move Prisma Directory
+        run: |
+          mv backend/prisma backend/dist/
+
+      - name: Build Frontend
+        run: |
+          cd frontend
+          pnpm run build
+
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: backend/dist/
