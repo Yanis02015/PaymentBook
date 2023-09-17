@@ -39,12 +39,13 @@ jobs:
 
       - name: Create .env File
         run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "SHADOW_DATABASE_URL=${{ secrets.SHADOW_DATABASE_URL }}" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> backend/dist/.env
+          echo "SHADOW_DATABASE_URL=${{ secrets.SHADOW_DATABASE_URL }}" >> backend/dist/.env
 
       - name: Move Prisma Directory
         run: |
-          mv backend/prisma backend/dist/
+          mkdir -p backend/dist/prisma
+          mv backend/prisma/schema.prisma backend/dist/prisma/schema.prisma
 
       - name: Build Frontend
         run: |
