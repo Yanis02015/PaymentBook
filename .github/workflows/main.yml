@@ -36,6 +36,7 @@ jobs:
         run: |
           cd backend
           pnpm run build
+          cp package.json dist/package.json
 
       - name: Create .env File
         run: |
