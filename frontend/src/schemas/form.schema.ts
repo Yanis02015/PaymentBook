@@ -43,3 +43,10 @@ export const PaymentForMonthSchema = z.object({
   workerId: z.string(),
   month: z.coerce.date(),
 });
+
+export const VocherTypeFormSchema = z.object({
+  name: z.string().min(2, "Au minimum 2 caractéres"),
+  remuneration: z.coerce
+    .number()
+    .min(500, "La rémunération du bon ne peut pas être inferieur à 500 DA."),
+});

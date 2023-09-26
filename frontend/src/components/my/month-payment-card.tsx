@@ -25,7 +25,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { useToast } from "../ui/use-toast";
-import { CreatePaymentForMonthDialog } from "./create-payment-dialog";
+import { CreatePaymentForMonthDialog } from "./dialogs/create-payment-dialog";
 import { PaymentPayRest } from "./payment-pay-rest";
 
 const getThemeByVocher = (rest: number) => {

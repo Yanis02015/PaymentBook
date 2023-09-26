@@ -22,19 +22,20 @@ import { WorkerSchema } from "@/schemas/worker.schema";
 import { queries } from "@/utils/queryKeys";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import { Loader2, Settings, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { DatePicker } from "./date-picker";
+} from "../../ui/select";
+import { DatePicker } from "../date-picker";
+import { VocherTypesSettingsDialog } from "./vocher-types-settings-dialog";
 
 type CreateVocherDialogProps = {
   isLoadind?: boolean;
@@ -51,6 +52,8 @@ export function CreateVocherDialog({
   onOpenChange,
   worker,
 }: CreateVocherDialogProps) {
+  const [vocherTypesDialogVisibility, setVocherTypesDialogVisibility] =
+    useState(false);
   const form = useForm<z.infer<typeof VocherFormSchema>>({
     resolver: zodResolver(VocherFormSchema),
     defaultValues: {
@@ -68,10 +71,27 @@ export function CreateVocherDialog({
     console.log("useEffect");
   }, [form, open, worker.id]);
 
-  const { data: vocherTypes } = useQuery({
+  const {
+    data: vocherTypes,
+    isLoading: isLoadindVocherTypes,
+    isError: isErrorVocherTypes,
+  } = useQuery({
     queryKey: [queries.vocherTypes],
     queryFn: getVocherTypes,
   });
+
+  const updateRemuneration = (typeId: string) => {
+    const oldRemunerationIsAuto =
+      vocherTypes?.find((v) => v.id == form.getValues("typeId"))
+        ?.remuneration === form.getValues("remuneration");
+
+    const remuneration = vocherTypes?.find((v) => v.id == typeId)?.remuneration;
+    if (
+      remuneration &&
+      (!form.getValues("remuneration") || oldRemunerationIsAuto)
+    )
+      form.setValue("remuneration", remuneration);
+  };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[550px]">
@@ -132,6 +152,70 @@ export function CreateVocherDialog({
               )}
             />
 
+            {/* Type of vocher */}
+            <FormField
+              control={form.control}
+              name="typeId"
+              render={({ field, fieldState }) => (
+                <FormItem className="grid grid-cols-4 items-center gap-x-4 w-full">
+                  <FormLabel className="text-right">Type de bon</FormLabel>
+                  <div className="col-span-3 flex gap-2">
+                    <Select
+                      key={field.value}
+                      onValueChange={(typeId) => {
+                        updateRemuneration(typeId);
+                        field.onChange(typeId);
+                      }}
+                      defaultValue={field.value}
+                    >
+                      <FormControl className="flex-1">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selectionner le type de bon" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {isLoadindVocherTypes ? (
+                          <div className="text-sm py-3 flex justify-center items-center">
+                            <Loader2
+                              strokeWidth={3}
+                              className="mr-2 h-4 w-4 animate-spin"
+                            />
+                            Récupération des types
+                          </div>
+                        ) : isErrorVocherTypes ? (
+                          <div className="text-sm py-3 flex justify-center items-center text-destructive font-bold">
+                            <X strokeWidth={4} className="mr-2 h-4 w-4" />
+                            Error lors de la récupération des donnée!
+                          </div>
+                        ) : (
+                          vocherTypes.map((type) => (
+                            <SelectItem
+                              className="capitalize"
+                              key={type.id}
+                              value={type.id}
+                            >
+                              {type.name}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      onClick={() => setVocherTypesDialogVisibility(true)}
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                    >
+                      <Settings />
+                    </Button>
+                  </div>
+                  {fieldState.invalid && (
+                    <FormMessage className="col-span-3 col-start-2" />
+                  )}
+                </FormItem>
+              )}
+            />
+
             {/* Rémunération */}
             <FormField
               control={form.control}
@@ -155,43 +239,6 @@ export function CreateVocherDialog({
                       }}
                     />
                   </FormControl>
-                  {fieldState.invalid && (
-                    <FormMessage className="col-span-3 col-start-2" />
-                  )}
-                </FormItem>
-              )}
-            />
-
-            {/* Type of vocher */}
-            <FormField
-              control={form.control}
-              name="typeId"
-              render={({ field, fieldState }) => (
-                <FormItem className="grid grid-cols-4 items-center gap-x-4 w-full">
-                  <FormLabel className="text-right">Type de bon</FormLabel>
-                  <Select
-                    key={field.value}
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl className="col-span-3">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a verified email to display" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {vocherTypes &&
-                        vocherTypes.map((type) => (
-                          <SelectItem
-                            className="capitalize"
-                            key={type.id}
-                            value={type.id}
-                          >
-                            {type.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
                   {fieldState.invalid && (
                     <FormMessage className="col-span-3 col-start-2" />
                   )}
@@ -228,6 +275,11 @@ export function CreateVocherDialog({
           </form>
         </Form>
       </DialogContent>
+      <VocherTypesSettingsDialog
+        types={vocherTypes}
+        onOpenChange={setVocherTypesDialogVisibility}
+        open={vocherTypesDialogVisibility}
+      />
     </Dialog>
   );
 }

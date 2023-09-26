@@ -16,27 +16,27 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PaymentForMonthSchema } from "@/schemas/form.schema";
+import { VochersPerMonthSchema } from "@/schemas/vocher.schema";
+import { WorkerSchema } from "@/schemas/worker.schema";
+import { paymentType } from "@/utils/enum";
+import { formatPayment, getFormatedDate } from "@/utils/functions";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Alert, AlertDescription, AlertTitle } from "../../ui/alert";
+import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { z } from "zod";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { PaymentForMonthSchema } from "@/schemas/form.schema";
-import { WorkerSchema } from "@/schemas/worker.schema";
-import { formatPayment, getFormatedDate } from "@/utils/functions";
-import { paymentType } from "@/utils/enum";
-import { Textarea } from "../ui/textarea";
-import { VochersPerMonthSchema } from "@/schemas/vocher.schema";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { PaymentPayRest } from "./payment-pay-rest";
+} from "../../ui/select";
+import { Textarea } from "../../ui/textarea";
+import { PaymentPayRest } from "../payment-pay-rest";
 
 type CreatePaymentForMonthDialogProps = {
   isLoadind?: boolean;

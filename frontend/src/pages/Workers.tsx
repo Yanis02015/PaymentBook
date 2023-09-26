@@ -5,7 +5,7 @@ import { workersColumns } from "@/utils/table/columns";
 import { queries } from "@/utils/queryKeys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
-import { CreateWorkerDialog } from "@/components/my/create-worker-dialog";
+import { CreateWorkerDialog } from "@/components/my/dialogs/create-worker-dialog";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 

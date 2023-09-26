@@ -8,10 +8,10 @@ import { DollarSign, LineChart, Pen, Plus } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { Button } from "../ui/button";
-import { CreateVocherDialog } from "./create-vocher-dialog";
 import { useToast } from "../ui/use-toast";
 import { NotFoundBadge } from "./not-found-badge";
 import { getFormatedDate } from "@/utils/functions";
+import { CreateVocherDialog } from "./dialogs/create-vocher-dialog";
 
 const profilElementClassName =
   "bg-slate-100 flex justify-between text-sm items-center p-2 rounded-lg";

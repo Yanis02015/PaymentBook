@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import {
   PaymentModel,
-  Prisma,
   VocherModel,
   VocherTypeModel,
   WorkerModel,
@@ -115,6 +114,50 @@ export const getVocherTypes = async (
   try {
     const types = await VocherTypeModel.findMany();
     res.status(200).json(types);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createVocherTypes = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { name, remuneration } = req.body;
+    if (!name)
+      throw new ExpressError("Le nom du bon ne peut pas être vide", 400);
+    if (!remuneration)
+      throw new ExpressError("La rémunération est requis", 400);
+    if (remuneration < 500)
+      throw new ExpressError(
+        "La rémunération ne peux pas être inferieur à 500 Da",
+        400
+      );
+    const type = await VocherTypeModel.findFirst({ where: { name } });
+    if (type) throw new ExpressError(`Le type "${type.name}" existe déjà`, 400);
+
+    await VocherTypeModel.create({ data: { name, remuneration } });
+    res.status(200).json({ message: "Type crée avec succès" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteVocherTypes = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { typeId } = req.params;
+    if (!typeId) throw new ExpressError("L'id est requis", 400);
+    const type = await VocherTypeModel.findFirst({ where: { id: typeId } });
+    if (!type) throw new ExpressError(`Le type n'existe pas`, 404);
+
+    await VocherTypeModel.delete({ where: { id: typeId } });
+    res.status(200).json({ message: "Type a été supprimé avec succès" });
   } catch (error) {
     next(error);
   }
