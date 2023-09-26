@@ -82,10 +82,13 @@ export default function Worker() {
             />
           )}
 
-          {isLoading &&
-            new Array(4)
-              .fill(0)
-              .map((_, i) => <PaymentMonthCardSheleton key={i} />)}
+          {isLoading && (
+            <div className="space-y-8">
+              {new Array(4).fill(0).map((_, i) => (
+                <PaymentMonthCardSheleton key={i} />
+              ))}
+            </div>
+          )}
           {vochers && worker && (
             <div className="space-y-8">
               {vochers?.map((vocher) => (
@@ -98,7 +101,11 @@ export default function Worker() {
               {vochers.length == 0 && (
                 <MissionNotFound
                   className="pt-20"
-                  message={`Aucune mission ni transaction trouvé pour l'année ${getSelectedYear()}`}
+                  message={
+                    years?.length == 0 && !Number(searchParams.get("year"))
+                      ? `Aucune mission ni transaction trouvé pour M. ${worker.fullname}`
+                      : `Aucune mission ni transaction trouvé pour l'année ${getSelectedYear()}`
+                  }
                 />
               )}
             </div>

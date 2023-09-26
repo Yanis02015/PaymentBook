@@ -31,6 +31,7 @@ import { DataTablePagination } from "./data-table-pagination";
 import { cn } from "@/lib/utils";
 import { Loading } from "../loading";
 import { Plus } from "lucide-react";
+import { getWorkersColumnName } from "@/utils/table/columns";
 
 type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
@@ -110,7 +111,7 @@ export function DataTable<TData, TValue>({
           <div className="flex gap-2 flex-wrap ml-auto">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">Columns</Button>
+                <Button variant="outline">Colonnes</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {table
@@ -126,7 +127,7 @@ export function DataTable<TData, TValue>({
                           column.toggleVisibility(!!value)
                         }
                       >
-                        {column.id}
+                        {getWorkersColumnName(column.id)}
                       </DropdownMenuCheckboxItem>
                     );
                   })}

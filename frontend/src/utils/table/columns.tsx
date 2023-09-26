@@ -8,6 +8,16 @@ export type FunctionsWorkersColumn = {
   delete: (id: string) => void;
 };
 
+const wokersColumnsName: { [key: string]: string | undefined } = {
+  firstname: "Nom",
+  lastname: "Prénom",
+  matricule: "Matricule",
+} as const;
+
+export const getWorkersColumnName = (name: string) => {
+  return wokersColumnsName[name] || name;
+};
+
 export const workersColumns = (): ColumnDef<z.infer<typeof Worker>>[] => [
   {
     header: "Profil",
