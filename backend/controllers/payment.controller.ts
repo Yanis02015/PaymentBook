@@ -65,6 +65,7 @@ export const getPaymentsOfMonth = async (
         gte: begin,
         lte: end,
       },
+      outOfVocher: false,
     },
   });
 };

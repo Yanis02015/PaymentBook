@@ -23,3 +23,5 @@ export const YearsWorkerSchema = z.array(
     vochers: z.coerce.number(),
   })
 );
+
+export type WorkerType = z.infer<typeof WorkerSchema>;

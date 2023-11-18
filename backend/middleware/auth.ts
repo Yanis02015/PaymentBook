@@ -1,4 +1,4 @@
-import { IRouterMatcher, NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 
 export const isAuthenticated = (
   req: Request,

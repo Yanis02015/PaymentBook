@@ -1,24 +1,36 @@
+import { phonenumberRegex } from "@/utils/regex";
 import * as z from "zod";
 
 export const LoginFormSchema = z.object({
   username: z
     .string()
-    .nonempty({ message: "Le nom d'utilisateur ne peux pas être vide." }),
+    .min(1, { message: "Le nom d'utilisateur ne peux pas être vide." }),
   password: z
     .string()
-    .nonempty({ message: "Le mot de passe ne peux pas être vide." }),
+    .min(1, { message: "Le mot de passe ne peux pas être vide." }),
 });
 
 export const WorkerFormSchema = z.object({
   firstname: z
     .string()
-    .nonempty({ message: "Le nom du travailleur ne peux pas être vide." }),
+    .min(1, { message: "Le nom du travailleur ne peux pas être vide." }),
   lastname: z
     .string()
-    .nonempty({ message: "Le prénom du travailleur ne peux pas être vide." }),
-  matricule: z.string().nonempty({
+    .min(1, { message: "Le prénom du travailleur ne peux pas être vide." }),
+  matricule: z.string().min(1, {
     message: "La matricule du travailleur ne peux pas être vide.",
   }),
+
+  phonenumber: z
+    .string()
+    .regex(phonenumberRegex, { message: "Numéro de téléphone mal formé" })
+    .optional(),
+  address: z.string().optional(),
+  birthdate: z.coerce.date().optional(),
+  email: z
+    .string()
+    .email({ message: "Le format de l'email est incorrect" })
+    .optional(),
 });
 
 export const VocherFormSchema = z.object({

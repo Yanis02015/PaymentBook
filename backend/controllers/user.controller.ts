@@ -4,6 +4,8 @@ import { ExpressError } from "../utils/error";
 
 export const login = (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate("local", (err: Error | undefined, user: any) => {
+    console.log(user);
+
     if (err) {
       return next(err);
     }
@@ -15,7 +17,7 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
       if (err) return next(err);
 
       // Vous pouvez renvoyer une réponse personnalisée ici
-      return res.json("Authentification réussie");
+      return res.status(200).json({ message: "Authentification réussie" });
     });
   })(req, res, next);
 };

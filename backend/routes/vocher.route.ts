@@ -8,16 +8,17 @@ import {
   createVocherTypes,
   deleteVocherTypes,
 } from "../controllers/vocher.controller";
+import { isAuthenticated } from "../middleware/auth";
 
 export const vocherRouter = express.Router();
 
-vocherRouter.get("/", getVochers);
-vocherRouter.get("/worker/:workerId", getWorkerVochers);
-vocherRouter.post("/", createVocher);
+vocherRouter.get("/", isAuthenticated, getVochers);
+vocherRouter.get("/worker/:workerId", isAuthenticated, getWorkerVochers);
+vocherRouter.post("/", isAuthenticated, createVocher);
 
-vocherRouter.get("/types", getVocherTypes);
-vocherRouter.post("/types", createVocherTypes);
-vocherRouter.delete("/types/:typeId", deleteVocherTypes);
+vocherRouter.get("/types", isAuthenticated, getVocherTypes);
+vocherRouter.post("/types", isAuthenticated, createVocherTypes);
+vocherRouter.delete("/types/:typeId", isAuthenticated, deleteVocherTypes);
 
-vocherRouter.get("/:id", getVocher);
+vocherRouter.get("/:id", isAuthenticated, getVocher);
 // vocherRouter.delete("/:id", deleteVocher);

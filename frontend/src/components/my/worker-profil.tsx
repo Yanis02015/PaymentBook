@@ -4,14 +4,23 @@ import { WorkerSchema } from "@/schemas/worker.schema";
 import { queries } from "@/utils/queryKeys";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { DollarSign, LineChart, Pen, Plus } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  DollarSign,
+  LineChart,
+  Pen,
+  Plus,
+} from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { Button } from "../ui/button";
 import { useToast } from "../ui/use-toast";
 import { NotFoundBadge } from "./not-found-badge";
-import { getFormatedDate } from "@/utils/functions";
+import { formatPayment, getFormatedDate } from "@/utils/functions";
 import { CreateVocherDialog } from "./dialogs/create-vocher-dialog";
+import { ModifyWorkerDialog } from "./dialogs/modify-worker";
+import { SimpleTooltip } from "../utils/simple-tooltip";
 
 const profilElementClassName =
   "bg-slate-100 flex justify-between text-sm items-center p-2 rounded-lg";
@@ -39,6 +48,7 @@ export const WorkerProfil = ({
       });
     },
   });
+  const [showInformations, setShowInformations] = useState(false);
   return (
     <div className={cn(className)}>
       <div
@@ -61,33 +71,65 @@ export const WorkerProfil = ({
             {worker.matricule}
           </span>
         </div>
-        <div className="space-y-2">
-          <div className={profilElementClassName}>
-            <strong>Adresse:</strong>
-            <span>{worker.address || <NotFoundBadge />}</span>
-          </div>
-          <div className={profilElementClassName}>
-            <strong>Tél:</strong>
-            <span>{worker.phonenumber || <NotFoundBadge />}</span>
-          </div>
-          <div className={profilElementClassName}>
-            <strong>Email:</strong>
-            <span>{worker.email || <NotFoundBadge />}</span>
-          </div>
-          <div className={profilElementClassName}>
-            <strong>D. Naissance:</strong>
-            <span>
-              {worker.birthdate ? (
-                getFormatedDate(worker.birthdate).fullDate
-              ) : (
-                <NotFoundBadge />
-              )}
-            </span>
+        <div className="flex flex-col border-2 border-green-400 p-2 pb-0 rounded-lg">
+          <Button
+            variant="link"
+            className="p-0 h-auto w-auto mr-auto gap-1 hover:text-green-400"
+            onClick={() => setShowInformations((h) => !h)}
+          >
+            {showInformations ? (
+              <ChevronUp size={17} />
+            ) : (
+              <ChevronDown size={17} />
+            )}
+            {showInformations
+              ? "Cacher les information"
+              : "Aficher les information"}
+          </Button>
+          <div
+            className={cn(
+              "space-y-2 my-2 overflow-hidden flex flex-col justify-end transition-all	max-h-96",
+              !showInformations && "max-h-0 my-1"
+            )}
+          >
+            <div className={profilElementClassName}>
+              <strong>Adresse:</strong>
+              <SimpleTooltip content={worker.address}>
+                <span className="line-clamp-1">
+                  {worker.address || <NotFoundBadge />}
+                </span>
+              </SimpleTooltip>
+            </div>
+            <div className={profilElementClassName}>
+              <strong>Tél:</strong>
+              <span className="line-clamp-1">
+                {worker.phonenumber || <NotFoundBadge />}
+              </span>
+            </div>
+            <div className={profilElementClassName}>
+              <strong>Email:</strong>
+              <span className="line-clamp-1">
+                {worker.email || <NotFoundBadge />}
+              </span>
+            </div>
+            <div className={profilElementClassName}>
+              <strong>D. Naissance:</strong>
+              <span className="line-clamp-1">
+                {worker.birthdate ? (
+                  getFormatedDate(worker.birthdate).fullDate
+                ) : (
+                  <NotFoundBadge />
+                )}
+              </span>
+            </div>
           </div>
         </div>
-        <Button variant="outline-green" size="lg">
-          <Pen size={17} className="mr-3" /> Modifier le profil
-        </Button>
+        <ModifyWorkerDialog
+          worker={worker}
+          className="absolute -top-4 right-1.5"
+        >
+          <Pen size={17} className="" />
+        </ModifyWorkerDialog>
       </div>
       <div className="space-y-2 pt-3 relative">
         <Button
@@ -104,7 +146,7 @@ export const WorkerProfil = ({
           <DollarSign size={17} className="absolute left-4" />
           <p>Effectuer un versement</p>
         </Button>
-        <div></div>
+
         <Button
           variant="outline"
           size="sm"
@@ -113,7 +155,21 @@ export const WorkerProfil = ({
           <LineChart size={17} className="absolute left-4" />
           <p>Voir les statistique</p>
         </Button>
+
+        <div className="bg-background border rounded-lg px-3 py-2 space-y-2">
+          <p className="text-muted-foreground font-semibold">
+            Total du solde hors bon
+          </p>
+          <h1 className="text-center text-2xl font-bold text-destructive pb-3">
+            {worker ? formatPayment(1000) || "Aucun crédit" : "Chargement..."}
+          </h1>
+          <Button size="sm" className="w-full relative" variant="outline">
+            <Plus size={17} className="absolute left-4" />
+            <p>Ajouter un solde</p>
+          </Button>
+        </div>
       </div>
+
       <CreateVocherDialog
         onOpenChange={setDialogVisibility}
         onSubmit={mutationCreateVocher.mutate}

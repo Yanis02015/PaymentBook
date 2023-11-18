@@ -11,8 +11,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { LoginFormSchema } from "@/schemas/form.schema";
 import { PATHS } from "@/utils/paths";
+import { queries } from "@/utils/queryKeys";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HTTPError } from "ky";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -31,11 +32,13 @@ export default function Login() {
   });
 
   const navigate = useNavigate();
-
+  const queryClient = useQueryClient();
   const submitMutation = useMutation({
     mutationFn: login,
     onSuccess: () => {
-      navigate(PATHS.DASHBOARD);
+      queryClient
+        .invalidateQueries([queries.loggedIn])
+        .then(() => navigate(PATHS.DASHBOARD));
     },
   });
 

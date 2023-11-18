@@ -3,14 +3,15 @@ import {
   createWorker,
   getWorker,
   getWorkers,
-  deleteWorker,
   getMissionsYears,
+  modifyWorker,
 } from "../controllers/worker.controller";
+import { isAuthenticated } from "../middleware/auth";
 
 export const workerRouter = express.Router();
 
-workerRouter.get("/", getWorkers);
-workerRouter.get("/:id", getWorker);
-workerRouter.post("/", createWorker);
-workerRouter.get("/years/:workerId", getMissionsYears);
-// workerRouter.delete("/:id", deleteWorker);
+workerRouter.get("/", isAuthenticated, getWorkers);
+workerRouter.get("/:id", isAuthenticated, getWorker);
+workerRouter.post("/", isAuthenticated, createWorker);
+workerRouter.get("/years/:workerId", isAuthenticated, getMissionsYears);
+workerRouter.put("/:workerId", isAuthenticated, modifyWorker);

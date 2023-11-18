@@ -4,7 +4,6 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"tsc --watch\" \"nodemon dist/server.js\"",
     "build": "tsc"
   },
@@ -13,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "5.2.0",
+    "@quixo3/prisma-session-store": "^3.1.13",
     "bcrypt": "^5.1.1",
     "connect-history-api-fallback": "^2.0.0",
     "cookie-parser": "^1.4.6",
@@ -35,6 +35,7 @@
     "@types/passport-local": "^1.0.35",
     "concurrently": "^8.2.1",
     "prisma": "^5.2.0",
+    "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }
 }

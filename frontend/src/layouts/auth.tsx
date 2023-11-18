@@ -9,14 +9,14 @@ import { HTTPError } from "ky";
 import { Navigate, Outlet } from "react-router-dom";
 
 export default function AuthLayout() {
-  const { isError, isLoading, error } = useQuery({
+  const { isError, isLoading, error, isFetching } = useQuery({
     queryKey: [queries.loggedIn],
     queryFn: refresh,
     refetchOnWindowFocus: false,
     retry: false,
   });
 
-  if (isLoading) return <Loading />;
+  if (isLoading || isFetching) return <Loading />;
 
   if (isError) {
     if (error instanceof HTTPError && error.response.status === 401)

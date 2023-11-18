@@ -1,6 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { ExpressError } from "../utils/error";
-import { Prisma, WorkerModel } from "../configurations/db";
+import {
+  PaymentModel,
+  Prisma,
+  VocherModel,
+  VocherTypeModel,
+  WorkerModel,
+} from "../configurations/db";
+import { Worker } from "@prisma/client";
 
 export const createWorker = async (
   req: Request,
@@ -89,6 +96,62 @@ export const getMissionsYears = async (
   }
 };
 
+export const modifyWorker = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { workerId } = req.params;
+    let {
+      matricule,
+      firstname,
+      lastname,
+      address,
+      birthdate,
+      email,
+      phonenumber,
+    } = req.body;
+
+    const worker = await WorkerModel.findUniqueOrThrow({
+      where: { id: workerId },
+    });
+    const newWorker = getWorkerToUpdate(
+      {
+        matricule,
+        firstname,
+        lastname,
+        address,
+        birthdate,
+        email,
+        phonenumber,
+      },
+      worker
+    );
+
+    await WorkerModel.update({ where: { id: workerId }, data: newWorker });
+    res.status(200).json({ message: "Employé modifié avec succès" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const exportWorkers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const workers = await WorkerModel.findMany();
+    const vochers = await VocherModel.findMany();
+    const payments = await PaymentModel.findMany();
+    const types = await VocherTypeModel.findMany();
+    res.status(200).json({ workers, types });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Function
 export const getYearsWorkerJob = async (
   workerId: string
@@ -106,4 +169,35 @@ export const getYearsWorkerJob = async (
   ORDER BY 
     year DESC;
 `;
+};
+
+const getWorkerToUpdate = (
+  newWorker: {
+    matricule?: string;
+    firstname?: string;
+    lastname?: string;
+    phonenumber?: string;
+    address?: string;
+    birthdate?: string;
+    email?: string;
+  },
+  {
+    matricule,
+    firstname,
+    lastname,
+    address,
+    birthdate,
+    email,
+    phonenumber,
+  }: Worker
+) => {
+  if (newWorker.matricule == matricule) newWorker.matricule = undefined;
+  if (newWorker.firstname == firstname) newWorker.firstname = undefined;
+  if (newWorker.lastname == lastname) newWorker.lastname = undefined;
+  if (newWorker.address == address) newWorker.address = undefined;
+  if (newWorker.phonenumber == phonenumber) newWorker.phonenumber = undefined;
+  if (newWorker.email == email) newWorker.email = undefined;
+  if (newWorker.birthdate == birthdate) newWorker.birthdate = undefined;
+
+  return newWorker;
 };

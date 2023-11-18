@@ -18,22 +18,26 @@ export const formatEventFormToJson = (
   return myJson;
 };
 
-export const getFormatedDate = (date: Date) => {
+export const getFormatedDate = (date?: Date) => {
+  if (!date) date = new Date();
   const dayOfWeek = format(date, "iii", { locale: fr });
   const dayInMonth = format(date, "dd", { locale: fr });
   const month = format(date, "LLL", { locale: fr });
   const hourse = format(date, "HH", { locale: fr });
   const minutes = format(date, "mm", { locale: fr });
+  const simpleTime = `${hourse}:${minutes}`;
 
   const fullDate = format(date, "P", { locale: fr });
+  const fullDateTime = `${fullDate} ${simpleTime}`;
   const fullMonth = format(date, "MMMM", { locale: fr });
   const year = format(date, "uuuu", { locale: fr });
   const monthYear = `${fullMonth} ${year}`;
 
   return {
     simpleDateWithDayWeek: `${dayOfWeek} ${dayInMonth}, ${month}`,
-    simpleTime: `${hourse}:${minutes}`,
     distanceStrict: formatDistanceStrict(new Date(), date),
+    fullDateTime,
+    simpleTime,
     fullDate,
     fullMonth,
     monthYear,
@@ -42,11 +46,12 @@ export const getFormatedDate = (date: Date) => {
 };
 
 export const formatPayment = (payment: number | string) => {
-  payment = payment.toString().split(".")[0].split(",")[0];
+  payment = Number(payment);
+
   return (
     payment
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0")
-      .split(".")[0] + ",00\u00A0DA"
+      .toFixed(2)
+      .replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0") // Une espace tous les 3 chiffres
+      .replace(".", ",") + "\u00A0DA"
   );
 };

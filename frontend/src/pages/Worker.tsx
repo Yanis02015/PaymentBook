@@ -55,7 +55,7 @@ export default function Worker() {
     enabled: Boolean(years),
   });
   return (
-    <>
+    <div>
       <Link
         to={PATHS.WORKERS}
         className={cn(
@@ -122,6 +122,6 @@ export default function Worker() {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

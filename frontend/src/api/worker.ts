@@ -11,3 +11,11 @@ export const getWorker = async (id: string) =>
 
 export const createWorker = async (worker: z.infer<typeof WorkerFormSchema>) =>
   await MakeRequest.post("workers", { json: worker }).json();
+
+export const modifyWorker = async ({
+  workerId,
+  worker,
+}: {
+  worker: z.infer<typeof WorkerFormSchema>;
+  workerId: string;
+}) => (await MakeRequest.put(`workers/${workerId}`, { json: worker })).json();

@@ -173,7 +173,7 @@ export const VocherTypesSettingsDialog = ({
                 {mutationCreateVocherType.isLoading && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Créer un nouveau bon
+                Créer un nouveau type
               </Button>
             </DialogFooter>
 
