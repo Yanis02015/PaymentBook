@@ -13,6 +13,7 @@ import {
   LineChart,
   Pen,
   Plus,
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
@@ -24,16 +25,19 @@ import { ModifyWorkerDialog } from "./dialogs/modify-worker";
 import { NotFoundBadge } from "./not-found-badge";
 import { CreateSoldeDialog } from "./dialogs/create-solde-dialog";
 import { CreatePaymentOutOfVocherDialog } from "./dialogs/create-payment-out-of-vocher-dialog";
+import { DeleteWorkerAlert } from "./alerts/delete-worker-alert";
 
 const profilElementClassName =
   "bg-slate-100 flex justify-between text-sm items-center p-2 rounded-lg";
 
 export const WorkerProfil = ({
   worker,
+  vocherLength,
   className,
 }: {
   worker: z.infer<typeof WorkerSchema>;
   className?: string;
+  vocherLength: number;
 }) => {
   const queryClient = useQueryClient();
 
@@ -80,12 +84,19 @@ export const WorkerProfil = ({
           </span>
         </div>
         <AccordionWorkerInformations worker={worker} />
-        <ModifyWorkerDialog
-          worker={worker}
-          className="absolute -top-4 right-1.5"
-        >
-          <Pen size={17} className="" />
-        </ModifyWorkerDialog>
+        <div className="absolute -top-4 right-1.5 flex flex-col">
+          <ModifyWorkerDialog worker={worker} className="">
+            <Pen size={17} className="" />
+          </ModifyWorkerDialog>
+          <DeleteWorkerAlert
+            worker={worker}
+            canBeDeleted={
+              !solde?.payment && !solde?.amount && vocherLength == 0
+            }
+          >
+            <Trash2 size={17} />
+          </DeleteWorkerAlert>
+        </div>
       </div>
       <div className="space-y-2 pt-3 relative">
         <Button

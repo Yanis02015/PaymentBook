@@ -19,3 +19,6 @@ export const modifyWorker = async ({
   worker: z.infer<typeof WorkerFormSchema>;
   workerId: string;
 }) => (await MakeRequest.put(`workers/${workerId}`, { json: worker })).json();
+
+export const deleteWorker = async (workerId: string) =>
+  await MakeRequest.delete(`workers/${workerId}`).json();

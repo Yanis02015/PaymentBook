@@ -114,6 +114,7 @@ export default function Worker() {
         <div className="relative w-full md:w-[300px] md:h-[auto] h-max">
           {worker ? (
             <WorkerProfil
+              vocherLength={vochers?.length || 0}
               worker={worker}
               className="h-fit sticky top-20 w-full w-full md:w-[300px]"
             />
