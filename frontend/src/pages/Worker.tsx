@@ -8,10 +8,12 @@ import { WorkerProfil } from "@/components/my/worker-profil";
 import { YearsCaroussel } from "@/components/my/years-carousel";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Error404 } from "@/components/utils/error";
 import { cn } from "@/lib/utils";
 import { PATHS } from "@/utils/paths";
 import { queries } from "@/utils/queryKeys";
 import { useQuery } from "@tanstack/react-query";
+import { HTTPError } from "ky";
 import { ArrowLeftIcon } from "lucide-react";
 import { useCallback } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
@@ -32,12 +34,28 @@ export default function Worker() {
     queryKey: [queries.yearsWorker, id],
     queryFn: () => getYearsOfWorker(id as string),
     enabled: Boolean(id),
+    retry(failureCount, error) {
+      if (error instanceof HTTPError && error.response.status == 404)
+        return false;
+      if (failureCount > 3) return false;
+      return true;
+    },
   });
 
-  const { data: worker } = useQuery({
+  const {
+    data: worker,
+    isError,
+    error,
+  } = useQuery({
     queryKey: [queries.workers, id],
     queryFn: () => getWorker(id as string),
     enabled: Boolean(id),
+    retry(failureCount, error) {
+      if (error instanceof HTTPError && error.response.status == 404)
+        return false;
+      if (failureCount > 3) return false;
+      return true;
+    },
   });
 
   const getSelectedYear = useCallback(() => {
@@ -54,6 +72,9 @@ export default function Worker() {
     queryFn: () => getWorkerVochers(id as string, getSelectedYear()),
     enabled: Boolean(years),
   });
+
+  if (error && error instanceof HTTPError && error.response.status == 404)
+    return <Error404 />;
   return (
     <div className="pb-5">
       <Link
@@ -118,6 +139,8 @@ export default function Worker() {
               worker={worker}
               className="h-fit sticky top-20 w-full w-full md:w-[300px]"
             />
+          ) : isError ? (
+            "error"
           ) : (
             <Skeleton className="h-full md:w-[300px]" />
           )}

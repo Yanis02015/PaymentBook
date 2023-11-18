@@ -5,6 +5,7 @@ import {
   getWorkers,
   getMissionsYears,
   modifyWorker,
+  deleteWorker,
 } from "../controllers/worker.controller";
 import { isAuthenticated } from "../middleware/auth";
 
@@ -15,3 +16,4 @@ workerRouter.get("/:id", isAuthenticated, getWorker);
 workerRouter.post("/", isAuthenticated, createWorker);
 workerRouter.get("/years/:workerId", isAuthenticated, getMissionsYears);
 workerRouter.put("/:workerId", isAuthenticated, modifyWorker);
+workerRouter.delete("/:workerId", isAuthenticated, deleteWorker);

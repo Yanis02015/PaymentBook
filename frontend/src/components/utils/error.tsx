@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { AlertTriangle } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import { Link } from "react-router-dom";
 import { PATHS } from "@/utils/paths";
 
@@ -25,6 +25,33 @@ export const Error = ({ className }: { className?: string }) => {
           <Button size="sm" variant="link">
             Se connecter
           </Button>
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+export const Error404 = ({ className }: { className?: string }) => {
+  return (
+    <div
+      className={cn(
+        "text-muted-foreground flex flex-col items-center gap-7 text-center",
+        className
+      )}
+    >
+      <AlertTriangle strokeWidth={1.2} className="h-48 w-48 sm:h-64 sm:w-64" />
+      <div className="space-y-1 font-extralight max-w-2xl">
+        <h1 className="text-3xl">Aucune donnée trouvé ici</h1>
+        <div className="pb-4">
+          La donnée que vous essayez de récupérer n'existe pas ou a étais
+          supprimer.
+        </div>
+
+        <Link
+          className={buttonVariants({ size: "sm", variant: "link" })}
+          to={PATHS.WORKERS}
+        >
+          Retourner en arriere
         </Link>
       </div>
     </div>

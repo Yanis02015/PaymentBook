@@ -14,10 +14,13 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { WorkerType } from "@/schemas/worker.schema";
-import { useMutation } from "@tanstack/react-query";
+import { PATHS } from "@/utils/paths";
+import { queries } from "@/utils/queryKeys";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HTTPError } from "ky";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { PropsWithChildren, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function DeleteWorkerAlert({
   children,
@@ -31,14 +34,23 @@ export function DeleteWorkerAlert({
 }>) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const quetyClient = useQueryClient();
+  const navigate = useNavigate();
   const mutationDeleteWorker = useMutation({
     mutationFn: deleteWorker,
     onSuccess: () => {
       setOpen(false);
+      quetyClient.invalidateQueries([queries.workers]);
+      quetyClient.invalidateQueries([queries.workers, worker.id]);
+      quetyClient.invalidateQueries([queries.vocherPerMonth, worker.id]);
+      quetyClient.invalidateQueries([queries.soldeAmount, worker.id]);
+      quetyClient.invalidateQueries([queries.soldes, worker.id]);
+      quetyClient.invalidateQueries([worker.id]);
       toast({
         title: "Employé supprimé",
         description: `Votre employé ${worker.fullname} à bien étais supprimer`,
       });
+      navigate(PATHS.WORKERS);
     },
     onError: (error: HTTPError) => {
       console.log(error);

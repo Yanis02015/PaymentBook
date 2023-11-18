@@ -57,9 +57,8 @@ export const deleteWorker = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const worker = await Prisma.worker.delete({ where: { id } });
-    if (!worker) throw new ExpressError("Aucun employé trouvé", 404);
+    const { workerId } = req.params;
+    const worker = await Prisma.worker.delete({ where: { id: workerId } });
     res.status(200).json(worker);
   } catch (error) {
     next(error);
