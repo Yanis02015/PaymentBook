@@ -85,10 +85,12 @@ export const createVocher = async (
   next: NextFunction
 ) => {
   try {
-    const { remuneration, quantity, workerId, typeId } = req.body;
+    const { remuneration, quantity, workerId, typeId, date } = req.body;
     let requireField = "";
-    if (!remuneration) requireField = "rémuneration";
-    else if (!quantity) requireField = "quantité";
+    if (!remuneration || typeof remuneration != "number")
+      requireField = "rémuneration";
+    else if (!quantity || typeof quantity != "number")
+      requireField = "quantité";
     else if (!workerId) requireField = "travailleur";
     else if (!typeId) requireField = "type";
     if (requireField)
@@ -99,7 +101,9 @@ export const createVocher = async (
     const worker = await WorkerModel.findFirst({ where: { id: workerId } });
     if (!worker) return next(new ExpressError("Aucun travailleur trouvé", 404));
 
-    const vochers = await VocherModel.create({ data: req.body });
+    const vochers = await VocherModel.create({
+      data: { remuneration, quantity, workerId, typeId, date },
+    });
     res.status(200).json(vochers);
   } catch (error) {
     next(error);

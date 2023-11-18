@@ -17,7 +17,7 @@ export const createPayment = async (
   next: NextFunction
 ) => {
   try {
-    const { amount, type, workerId, month } = req.body;
+    const { amount, type, workerId, month, description } = req.body;
     if (!amount || !(Number(amount) > 0))
       throw new ExpressError("Le montant du payement n'est pas valide.", 400);
     if (type && ![PaymentType.CASH, PaymentType.GOODS].includes(type))
@@ -48,7 +48,13 @@ export const createPayment = async (
       );
 
     const payment = await PaymentModel.create({
-      data: req.body,
+      data: {
+        amount,
+        description: description || undefined,
+        month,
+        type,
+        workerId,
+      },
       select: { amount: true, month: true, description: true, type: true },
     });
 

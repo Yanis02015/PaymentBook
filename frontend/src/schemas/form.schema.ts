@@ -36,7 +36,7 @@ export const WorkerFormSchema = z.object({
 export const VocherFormSchema = z.object({
   remuneration: z.coerce
     .number()
-    .min(500, "La rémunération du bon ne peut pas être inferieur à 500 DA."),
+    .min(10, "La rémunération du bon ne peut pas être inferieur à 10 DA."),
   quantity: z.coerce.number().min(1, "Le nombre de bon ne peut pas être zéro."),
   workerId: z.string().optional(),
   typeId: z.string(),
@@ -67,7 +67,7 @@ export const VocherTypeFormSchema = z.object({
   name: z.string().min(2, "Au minimum 2 caractéres"),
   remuneration: z.coerce
     .number()
-    .min(500, "La rémunération du bon ne peut pas être inferieur à 500 DA."),
+    .min(10, "La rémunération du bon ne peut pas être inferieur à 10 DA."),
 });
 
 export const SoldeFormSchema = z.object({
