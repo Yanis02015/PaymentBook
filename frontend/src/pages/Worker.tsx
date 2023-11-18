@@ -76,7 +76,7 @@ export default function Worker() {
   if (error && error instanceof HTTPError && error.response.status == 404)
     return <Error404 />;
   return (
-    <div className="pb-5">
+    <div>
       <Link
         to={PATHS.WORKERS}
         className={cn(

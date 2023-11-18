@@ -33,7 +33,7 @@ export default function AuthLayout() {
   }
 
   return (
-    <div className="container">
+    <div className="container pb-5">
       <div className="flex justify-end py-4">
         <LogoutButton />
       </div>
