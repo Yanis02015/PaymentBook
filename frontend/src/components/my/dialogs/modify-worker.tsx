@@ -35,7 +35,7 @@ import { queries } from "@/utils/queryKeys";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HTTPError } from "ky";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { PropsWithChildren, useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -291,7 +291,12 @@ export const ModifyWorkerDialog = ({
               <DialogClose className={buttonVariants({ variant: "outline" })}>
                 Fermer
               </DialogClose>
-              <Button disabled={hasNoChange()}>
+              <Button
+                disabled={hasNoChange() || mutationUpdateWorker.isLoading}
+              >
+                {mutationUpdateWorker.isLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Aucune modification faite
               </Button>
             </DialogFooter>

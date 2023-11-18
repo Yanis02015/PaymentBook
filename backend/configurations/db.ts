@@ -22,3 +22,4 @@ export const WorkerModel = Prisma.worker;
 export const VocherModel = Prisma.vocher;
 export const PaymentModel = Prisma.payment;
 export const VocherTypeModel = Prisma.vocherType;
+export const SoldeModel = Prisma.solde;

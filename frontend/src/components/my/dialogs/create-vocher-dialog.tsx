@@ -17,6 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { WorkerMiniProfil } from "@/components/utils/worker-mini-profil";
 import { VocherFormSchema } from "@/schemas/form.schema";
 import { WorkerSchema } from "@/schemas/worker.schema";
 import { queries } from "@/utils/queryKeys";
@@ -26,7 +27,6 @@ import { Loader2, Settings, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import {
   Select,
   SelectContent,
@@ -109,18 +109,7 @@ export function CreateVocherDialog({
             </DialogHeader>
 
             {/* Worker profil */}
-            <div className="flex gap-3 items-center bg-slate-100 rounded-lg p-3">
-              <Avatar className="w-14 h-14">
-                <AvatarImage src={worker.image} />
-                <AvatarFallback>{worker.fullname.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-semibold">{worker.fullname}</h3>
-                <p className="text-muted-foreground text-xs">
-                  {worker.matricule}
-                </p>
-              </div>
-            </div>
+            <WorkerMiniProfil worker={worker} />
 
             {/* Number of vocher */}
             <FormField

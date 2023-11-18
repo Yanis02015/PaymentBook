@@ -1,9 +1,11 @@
+import { getWorkerSoldeAmount } from "@/api/solde";
 import { createVocher } from "@/api/vocher";
 import { cn } from "@/lib/utils";
-import { WorkerSchema } from "@/schemas/worker.schema";
+import { WorkerSchema, WorkerType } from "@/schemas/worker.schema";
+import { formatPayment, getFormatedDate } from "@/utils/functions";
 import { queries } from "@/utils/queryKeys";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ChevronDown,
   ChevronUp,
@@ -14,13 +16,13 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import { useToast } from "../ui/use-toast";
-import { NotFoundBadge } from "./not-found-badge";
-import { formatPayment, getFormatedDate } from "@/utils/functions";
+import { SimpleTooltip } from "../utils/simple-tooltip";
 import { CreateVocherDialog } from "./dialogs/create-vocher-dialog";
 import { ModifyWorkerDialog } from "./dialogs/modify-worker";
-import { SimpleTooltip } from "../utils/simple-tooltip";
+import { NotFoundBadge } from "./not-found-badge";
+import { CreateSoldeDialog } from "./dialogs/create-solde-dialog";
 
 const profilElementClassName =
   "bg-slate-100 flex justify-between text-sm items-center p-2 rounded-lg";
@@ -48,12 +50,17 @@ export const WorkerProfil = ({
       });
     },
   });
-  const [showInformations, setShowInformations] = useState(false);
+
+  const { data: solde } = useQuery({
+    queryKey: [queries.soldes, queries.soldeAmount, worker.id],
+    queryFn: () => getWorkerSoldeAmount(worker.id),
+    enabled: !!worker.id,
+  });
   return (
     <div className={cn(className)}>
       <div
         className={cn(
-          "gap-4 text-center bg-white rounded-xl pb-5 px-3 space-y-5 relative mt-16 pt-12"
+          "gap-4 text-center bg-white rounded-xl pb-3 px-3 space-y-5 relative mt-16 pt-12"
         )}
       >
         <div className="w-32 m-auto absolute left-0 right-0 m-auto -top-16">
@@ -71,59 +78,7 @@ export const WorkerProfil = ({
             {worker.matricule}
           </span>
         </div>
-        <div className="flex flex-col border-2 border-green-400 p-2 pb-0 rounded-lg">
-          <Button
-            variant="link"
-            className="p-0 h-auto w-auto mr-auto gap-1 hover:text-green-400"
-            onClick={() => setShowInformations((h) => !h)}
-          >
-            {showInformations ? (
-              <ChevronUp size={17} />
-            ) : (
-              <ChevronDown size={17} />
-            )}
-            {showInformations
-              ? "Cacher les information"
-              : "Aficher les information"}
-          </Button>
-          <div
-            className={cn(
-              "space-y-2 my-2 overflow-hidden flex flex-col justify-end transition-all	max-h-96",
-              !showInformations && "max-h-0 my-1"
-            )}
-          >
-            <div className={profilElementClassName}>
-              <strong>Adresse:</strong>
-              <SimpleTooltip content={worker.address}>
-                <span className="line-clamp-1">
-                  {worker.address || <NotFoundBadge />}
-                </span>
-              </SimpleTooltip>
-            </div>
-            <div className={profilElementClassName}>
-              <strong>Tél:</strong>
-              <span className="line-clamp-1">
-                {worker.phonenumber || <NotFoundBadge />}
-              </span>
-            </div>
-            <div className={profilElementClassName}>
-              <strong>Email:</strong>
-              <span className="line-clamp-1">
-                {worker.email || <NotFoundBadge />}
-              </span>
-            </div>
-            <div className={profilElementClassName}>
-              <strong>D. Naissance:</strong>
-              <span className="line-clamp-1">
-                {worker.birthdate ? (
-                  getFormatedDate(worker.birthdate).fullDate
-                ) : (
-                  <NotFoundBadge />
-                )}
-              </span>
-            </div>
-          </div>
-        </div>
+        <AccordionWorkerInformations worker={worker} />
         <ModifyWorkerDialog
           worker={worker}
           className="absolute -top-4 right-1.5"
@@ -138,13 +93,6 @@ export const WorkerProfil = ({
           className="w-full"
         >
           <Plus size={17} className="absolute left-4" /> Ajouter une mission
-        </Button>
-        <Button
-          size="sm"
-          className="w-full bg-blue-400 hover:bg-blue-400/90 cursor-not-allowed"
-        >
-          <DollarSign size={17} className="absolute left-4" />
-          <p>Effectuer un versement</p>
         </Button>
 
         <Button
@@ -161,11 +109,50 @@ export const WorkerProfil = ({
             Total du solde hors bon
           </p>
           <h1 className="text-center text-2xl font-bold text-destructive pb-3">
-            {worker ? formatPayment(1000) || "Aucun crédit" : "Chargement..."}
+            {solde
+              ? solde?.amount
+                ? formatPayment(solde?.amount)
+                : "Aucun solde restant"
+              : "Chargement..."}
           </h1>
-          <Button size="sm" className="w-full relative" variant="outline">
+          {solde && (
+            <div className="space-y-3 pb-2">
+              <div>
+                <p className="text-muted-foreground font-semibold">
+                  Total du solde hors bon
+                </p>
+                <p className="text-destructive text-center font-semibold">
+                  {formatPayment(solde.amount)}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-muted-foreground font-semibold">
+                  Total des versement sans bon
+                </p>
+                <p className="text-destructive text-center font-semibold">
+                  {formatPayment(solde.payment)}
+                </p>
+              </div>
+            </div>
+          )}
+          <CreateSoldeDialog
+            worker={worker}
+            className={buttonVariants({
+              size: "sm",
+              variant: "outline",
+              className: "w-full relative",
+            })}
+          >
             <Plus size={17} className="absolute left-4" />
             <p>Ajouter un solde</p>
+          </CreateSoldeDialog>
+          <Button
+            size="sm"
+            className="w-full bg-blue-400 hover:bg-blue-400/90 cursor-not-allowed relative"
+          >
+            <DollarSign size={17} className="absolute left-4" />
+            <p>Effectuer un versement</p>
           </Button>
         </div>
       </div>
@@ -176,6 +163,62 @@ export const WorkerProfil = ({
         open={dialogVisibility}
         worker={worker}
       />
+    </div>
+  );
+};
+
+const AccordionWorkerInformations = ({ worker }: { worker: WorkerType }) => {
+  const [showInformations, setShowInformations] = useState(false);
+
+  return (
+    <div className="flex flex-col border-2 border-green-400 p-2 pb-0 rounded-lg">
+      <Button
+        variant="link"
+        className="p-0 h-auto w-auto mr-auto gap-1 hover:text-green-400"
+        onClick={() => setShowInformations((h) => !h)}
+      >
+        {showInformations ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
+        {showInformations
+          ? "Cacher les information"
+          : "Aficher les information"}
+      </Button>
+      <div
+        className={cn(
+          "space-y-2 my-2 overflow-hidden flex flex-col justify-end transition-all	max-h-96",
+          !showInformations && "max-h-0 my-1"
+        )}
+      >
+        <div className={profilElementClassName}>
+          <strong>Adresse:</strong>
+          <SimpleTooltip content={worker.address}>
+            <span className="line-clamp-1">
+              {worker.address || <NotFoundBadge />}
+            </span>
+          </SimpleTooltip>
+        </div>
+        <div className={profilElementClassName}>
+          <strong>Tél:</strong>
+          <span className="line-clamp-1">
+            {worker.phonenumber || <NotFoundBadge />}
+          </span>
+        </div>
+        <div className={profilElementClassName}>
+          <strong>Email:</strong>
+          <span className="line-clamp-1">
+            {worker.email || <NotFoundBadge />}
+          </span>
+        </div>
+        <div className={profilElementClassName}>
+          <strong>D. Naissance:</strong>
+          <span className="line-clamp-1">
+            {worker.birthdate ? (
+              getFormatedDate(worker.birthdate).fullDate
+            ) : (
+              <NotFoundBadge />
+            )}
+          </span>
+        </div>
+      </div>
     </div>
   );
 };

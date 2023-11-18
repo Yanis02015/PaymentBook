@@ -62,3 +62,11 @@ export const VocherTypeFormSchema = z.object({
     .number()
     .min(500, "La rémunération du bon ne peut pas être inferieur à 500 DA."),
 });
+
+export const SoldeFormSchema = z.object({
+  amount: z.coerce
+    .number()
+    .min(1, { message: "Le mountant ne peut pas être inferieur à 1 DA" }),
+  description: z.string().optional(),
+  workerId: z.string().min(1, { message: "Employé requis" }),
+});

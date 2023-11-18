@@ -1,12 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ExpressError } from "../utils/error";
-import {
-  PaymentModel,
-  Prisma,
-  VocherModel,
-  VocherTypeModel,
-  WorkerModel,
-} from "../configurations/db";
+import { Prisma, WorkerModel } from "../configurations/db";
 import { Worker } from "@prisma/client";
 
 export const createWorker = async (
@@ -131,22 +125,6 @@ export const modifyWorker = async (
 
     await WorkerModel.update({ where: { id: workerId }, data: newWorker });
     res.status(200).json({ message: "Employé modifié avec succès" });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const exportWorkers = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const workers = await WorkerModel.findMany();
-    const vochers = await VocherModel.findMany();
-    const payments = await PaymentModel.findMany();
-    const types = await VocherTypeModel.findMany();
-    res.status(200).json({ workers, types });
   } catch (error) {
     next(error);
   }

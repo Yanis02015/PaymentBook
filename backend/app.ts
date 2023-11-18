@@ -12,6 +12,7 @@ import { catchError } from "./configurations/error";
 import path from "path";
 import { paymentRouter } from "./routes/payment.route";
 import history from "connect-history-api-fallback";
+import { soldeRouter } from "./routes/solde.route";
 
 export const app = express();
 
@@ -26,6 +27,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/workers", workerRouter);
 app.use("/api/vochers", vocherRouter);
 app.use("/api/payments", paymentRouter);
+app.use("/api/soldes", soldeRouter);
 
 // Static ressources
 

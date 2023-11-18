@@ -7,4 +7,6 @@ export const queries = {
   vocherPerMonth: "vocherPerMonth",
   vocherTypes: "vocherTypes",
   payments: "payments",
+  soldes: "soldes",
+  soldeAmount: "soldeAmount",
 };
