@@ -117,7 +117,9 @@ export const WorkerProfil = ({
         </Button>
 
         <div className="bg-background border rounded-lg px-3 py-2 space-y-2">
-          <p className="text-muted-foreground font-semibold">Solde restant</p>
+          <p className="text-muted-foreground font-semibold">
+            Solde restant (HORS BON)
+          </p>
           <h1 className="text-center text-2xl font-bold text-destructive pb-3 !mt-0">
             {solde
               ? solde?.rest
