@@ -63,7 +63,7 @@ export const getWorkerVochers = async (
     const { group } = req.query;
     if (group == "month") {
       const payments = await PaymentModel.findMany({
-        where: { workerId, month: date },
+        where: { workerId, month: date, outOfVocher: false },
         orderBy: {
           createdAt: "asc",
         },

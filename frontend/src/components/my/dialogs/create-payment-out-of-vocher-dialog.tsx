@@ -1,11 +1,13 @@
+import { createPaymentOutOfVocher } from "@/api/payment";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -16,130 +18,138 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { PaymentForMonthSchema } from "@/schemas/form.schema";
-import { VochersPerMonthSchema } from "@/schemas/vocher.schema";
-import { WorkerSchema } from "@/schemas/worker.schema";
-import { paymentType } from "@/utils/enum";
-import { formatPayment, getFormatedDate } from "@/utils/functions";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircle, Loader2 } from "lucide-react";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Alert, AlertDescription, AlertTitle } from "../../ui/alert";
-import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../ui/select";
-import { Textarea } from "../../ui/textarea";
-import { PaymentPayRest } from "../payment-pay-rest";
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+import { WorkerMiniProfil } from "@/components/utils/worker-mini-profil";
+import { PaymentOutOfVocherFormSchema } from "@/schemas/form.schema";
+import { WorkerType } from "@/schemas/worker.schema";
+import { paymentType } from "@/utils/enum";
+import { formatPayment } from "@/utils/functions";
+import { queries } from "@/utils/queryKeys";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { HTTPError } from "ky";
+import { AlertCircle } from "lucide-react";
+import { PropsWithChildren, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-type CreatePaymentForMonthDialogProps = {
-  isLoadind?: boolean;
-  onSubmit: (payment: z.infer<typeof PaymentForMonthSchema>) => void;
-  open: boolean;
-  onOpenChange: (visibility: boolean) => void;
-  worker: z.infer<typeof WorkerSchema>;
-  vocherPerMonth: z.infer<typeof VochersPerMonthSchema>;
-};
-
-export const CreatePaymentForMonthDialog = ({
-  isLoadind,
-  onSubmit,
-  open,
-  onOpenChange,
+export const CreatePaymentOutOfVocherDialog = ({
   worker,
-  vocherPerMonth,
-}: CreatePaymentForMonthDialogProps) => {
-  const form = useForm<z.infer<typeof PaymentForMonthSchema>>({
-    resolver: zodResolver(PaymentForMonthSchema),
+  children,
+  className,
+  rest,
+}: PropsWithChildren<{
+  worker: WorkerType;
+  className?: string;
+  rest: number;
+}>) => {
+  const [open, setOpen] = useState(false);
+  const form = useForm<z.infer<typeof PaymentOutOfVocherFormSchema>>({
+    resolver: zodResolver(PaymentOutOfVocherFormSchema),
     reValidateMode: "onBlur",
     defaultValues: {
       amount: 0,
-      description: "",
-      month: vocherPerMonth.date,
       type: "CASH",
+      description: "",
       workerId: worker.id,
     },
   });
 
-  useEffect(() => {
-    form.reset();
-    form.setValue("workerId", worker.id);
-    form.setValue("month", vocherPerMonth.date);
-  }, [form, vocherPerMonth.date, open, worker.id]);
+  const onSubmit = (values: z.infer<typeof PaymentOutOfVocherFormSchema>) => {
+    mutationCreateSolde.mutate(values);
+  };
+
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const mutationCreateSolde = useMutation({
+    mutationFn: createPaymentOutOfVocher,
+    onSuccess: (_, data) => {
+      queryClient.invalidateQueries([queries.soldes, data.workerId]);
+      queryClient.invalidateQueries([
+        queries.soldes,
+        queries.soldeAmount,
+        data.workerId,
+      ]);
+      onOpenChange(false);
+      toast({
+        title: "Versement ajouté avec succès",
+        description: `Le nouveau versement de ${formatPayment(
+          data.amount
+        )} est ajouté avec succès à l'employé ${worker.fullname}`,
+      });
+    },
+    onError: (error: HTTPError) => {
+      console.log(error);
+      toast({
+        title: "Oh oh, versement échoués",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const watch = form.watch();
   useEffect(() => {
     form.clearErrors("amount");
-    if (watch.amount > vocherPerMonth.rest) {
+    if (watch.amount > rest) {
       form.setError("amount", {
         message: `Vous ne pouvez pas verser une somme plus grande que ${formatPayment(
-          vocherPerMonth.rest
+          rest
         )}`,
         type: "maxLength",
       });
     }
-  }, [form, vocherPerMonth.rest, watch.amount]);
+  }, [form, rest, watch.amount]);
+
   const verifyBeforeSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (form.getValues("amount") > vocherPerMonth.rest) return;
+    if (form.getValues("amount") > rest) return;
     form.handleSubmit(onSubmit)(event);
   };
+
+  const onOpenChange = (visibility: boolean) => {
+    setOpen(visibility);
+    form.reset({
+      amount: 0,
+      description: "",
+      type: "CASH",
+      workerId: worker.id,
+    });
+  };
   return (
-    <Dialog modal open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[650px]">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger className={className}>{children}</DialogTrigger>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Faire un versement hors bon</DialogTitle>
+          <DialogDescription>
+            Entrez ici les informations du versement hors bon et cliquer sur
+            valider.
+          </DialogDescription>
+        </DialogHeader>
+
+        <WorkerMiniProfil worker={worker} />
+
         <Form {...form}>
-          <form onSubmit={verifyBeforeSubmit} className="grid gap-4 py-4">
-            <DialogHeader>
-              <DialogTitle>
-                Effectuer un verssement pour{" "}
-                {getFormatedDate(vocherPerMonth.date).monthYear}
-              </DialogTitle>
-              <DialogDescription>
-                Entrez ici les informations du versement et cliquer sur valider.
-              </DialogDescription>
-            </DialogHeader>
-
-            {/* Worker profil */}
-            <div className="flex flex-wrap gap-3 items-center bg-slate-100 rounded-lg p-3">
-              <Avatar className="w-14 h-14">
-                <AvatarImage src={worker.image} />
-                <AvatarFallback>{worker.fullname.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-semibold">{worker.fullname}</h3>
-                <p className="text-muted-foreground text-xs">
-                  {worker.matricule}
-                </p>
-              </div>
-              <h3 className=" bg-green-400/70 text-white py-2 px-4 rounded-lg font-bold text-xl ml-auto capitalize">
-                {getFormatedDate(vocherPerMonth.date).monthYear}
-              </h3>
-            </div>
-
-            <PaymentPayRest
-              pay={vocherPerMonth.pay}
-              rest={vocherPerMonth.rest}
-              total={vocherPerMonth.total}
-              mini
-            />
-
-            {/* Alert rest < pay */}
+          <form onSubmit={verifyBeforeSubmit} className="space-y-3">
             {form.getFieldState("amount").error?.type == "maxLength" && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Alert dépassement!</AlertTitle>
                 <AlertDescription>
                   La somme à versé est très elevé, le maximum que vous puissiez
-                  verser est {formatPayment(vocherPerMonth.rest)}.
+                  verser est {formatPayment(rest)}.
                   <Button
                     type="button"
-                    onClick={() => form.setValue("amount", vocherPerMonth.rest)}
+                    onClick={() => form.setValue("amount", rest)}
                     variant="link"
                     className="px-1.5 py-0 h-min"
                   >
@@ -149,7 +159,6 @@ export const CreatePaymentForMonthDialog = ({
               </Alert>
             )}
 
-            {/* Payment amount */}
             <FormField
               control={form.control}
               name="amount"
@@ -179,7 +188,6 @@ export const CreatePaymentForMonthDialog = ({
               )}
             />
 
-            {/* Payment type */}
             <FormField
               control={form.control}
               name="type"
@@ -215,18 +223,18 @@ export const CreatePaymentForMonthDialog = ({
               )}
             />
 
-            {/* Description */}
             <FormField
               control={form.control}
               name="description"
               render={({ field, fieldState }) => (
                 <FormItem className="grid grid-cols-4 items-center gap-x-4">
-                  <FormLabel className="text-right">Description</FormLabel>
+                  <FormLabel className="text-right">
+                    Description du versement
+                  </FormLabel>
                   <FormControl className="col-span-3">
                     <Textarea
-                      placeholder="Description du verssement"
+                      placeholder="Description du versement"
                       {...field}
-                      value={field.value || ""}
                     />
                   </FormControl>
                   {fieldState.invalid && (
@@ -235,14 +243,6 @@ export const CreatePaymentForMonthDialog = ({
                 </FormItem>
               )}
             />
-
-            {/* Actions buttons */}
-            <DialogFooter>
-              <Button disabled={isLoadind} type="submit">
-                {isLoadind && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Valider le versement
-              </Button>
-            </DialogFooter>
           </form>
         </Form>
       </DialogContent>

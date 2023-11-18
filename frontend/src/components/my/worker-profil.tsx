@@ -23,6 +23,7 @@ import { CreateVocherDialog } from "./dialogs/create-vocher-dialog";
 import { ModifyWorkerDialog } from "./dialogs/modify-worker";
 import { NotFoundBadge } from "./not-found-badge";
 import { CreateSoldeDialog } from "./dialogs/create-solde-dialog";
+import { CreatePaymentOutOfVocherDialog } from "./dialogs/create-payment-out-of-vocher-dialog";
 
 const profilElementClassName =
   "bg-slate-100 flex justify-between text-sm items-center p-2 rounded-lg";
@@ -105,35 +106,28 @@ export const WorkerProfil = ({
         </Button>
 
         <div className="bg-background border rounded-lg px-3 py-2 space-y-2">
-          <p className="text-muted-foreground font-semibold">
-            Total du solde hors bon
-          </p>
-          <h1 className="text-center text-2xl font-bold text-destructive pb-3">
+          <p className="text-muted-foreground font-semibold">Solde restant</p>
+          <h1 className="text-center text-2xl font-bold text-destructive pb-3 !mt-0">
             {solde
-              ? solde?.amount
-                ? formatPayment(solde?.amount)
+              ? solde?.rest
+                ? formatPayment(solde?.rest)
                 : "Aucun solde restant"
               : "Chargement..."}
           </h1>
           {solde && (
-            <div className="space-y-3 pb-2">
-              <div>
-                <p className="text-muted-foreground font-semibold">
-                  Total du solde hors bon
-                </p>
-                <p className="text-destructive text-center font-semibold">
+            <div className="space-y-1 pb-2 text-xs">
+              <p>
+                Total des anciens soldes:{" "}
+                <strong className="text-destructive">
                   {formatPayment(solde.amount)}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-muted-foreground font-semibold">
-                  Total des versement sans bon
-                </p>
-                <p className="text-destructive text-center font-semibold">
+                </strong>
+              </p>
+              <p>
+                Total des anciens versement:{" "}
+                <strong className="text-green-500">
                   {formatPayment(solde.payment)}
-                </p>
-              </div>
+                </strong>
+              </p>
             </div>
           )}
           <CreateSoldeDialog
@@ -147,13 +141,20 @@ export const WorkerProfil = ({
             <Plus size={17} className="absolute left-4" />
             <p>Ajouter un solde</p>
           </CreateSoldeDialog>
-          <Button
-            size="sm"
-            className="w-full bg-blue-400 hover:bg-blue-400/90 cursor-not-allowed relative"
+          <CreatePaymentOutOfVocherDialog
+            className={cn(
+              buttonVariants({
+                size: "sm",
+                className: "w-full relative",
+              }),
+              "bg-blue-400 hover:bg-blue-400/90"
+            )}
+            worker={worker}
+            rest={solde?.rest || 0}
           >
             <DollarSign size={17} className="absolute left-4" />
             <p>Effectuer un versement</p>
-          </Button>
+          </CreatePaymentOutOfVocherDialog>
         </div>
       </div>
 

@@ -56,6 +56,13 @@ export const PaymentForMonthSchema = z.object({
   month: z.coerce.date(),
 });
 
+export const PaymentOutOfVocherFormSchema = z.object({
+  amount: z.coerce.number(),
+  type: z.enum(["CASH", "GOODS"]),
+  description: z.string().optional(),
+  workerId: z.string().min(1, { message: "Erreur de selection d'employé" }),
+});
+
 export const VocherTypeFormSchema = z.object({
   name: z.string().min(2, "Au minimum 2 caractéres"),
   remuneration: z.coerce

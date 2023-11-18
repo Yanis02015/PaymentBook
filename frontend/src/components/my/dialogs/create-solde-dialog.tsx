@@ -71,7 +71,7 @@ export const CreateSoldeDialog = ({
     onError: (error: HTTPError) => {
       console.log(error);
       toast({
-        title: "Oh oh, modifications échoués",
+        title: "Oh oh, ajout de solde échoués",
         description: error.message,
         variant: "destructive",
       });

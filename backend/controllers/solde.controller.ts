@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { ExpressError } from "../utils/error";
 import { PaymentModel, SoldeModel, WorkerModel } from "../configurations/db";
 import { Decimal } from "@prisma/client/runtime/library";
+import { getSoldesAmountsAndRest } from "../classes/solde.class";
 
 export const createSolde = async (
   req: Request,
@@ -58,21 +59,8 @@ export const getSoldeAmountByWorkerId = async (
       where: { id: workerId },
     });
 
-    const { _sum: soldeSum } = await SoldeModel.aggregate({
-      where: { workerId },
-      _sum: { amount: true },
-    });
-
-    const { _sum: PaymentSum } = await PaymentModel.aggregate({
-      where: { workerId, outOfVocher: true },
-      _sum: { amount: true },
-    });
-    soldeSum.amount = soldeSum.amount || new Decimal(0);
-    PaymentSum.amount = PaymentSum.amount || new Decimal(0);
-    const rest = soldeSum.amount.minus(PaymentSum.amount);
-    res
-      .status(200)
-      .json({ amount: soldeSum.amount, rest, payment: PaymentSum.amount });
+    const { payment, rest, amount } = await getSoldesAmountsAndRest(workerId);
+    res.status(200).json({ amount, rest, payment });
   } catch (error) {
     next(error);
   }
