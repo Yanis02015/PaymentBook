@@ -11,6 +11,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { WorkerType } from "@/schemas/worker.schema";
@@ -39,7 +41,7 @@ export function DeleteWorkerAlert({
   const mutationDeleteWorker = useMutation({
     mutationFn: deleteWorker,
     onSuccess: () => {
-      setOpen(false);
+      onOpenChange(false);
       quetyClient.invalidateQueries([queries.workers]);
       quetyClient.invalidateQueries([queries.workers, worker.id]);
       quetyClient.invalidateQueries([queries.vocherPerMonth, worker.id]);
@@ -61,8 +63,16 @@ export function DeleteWorkerAlert({
       });
     },
   });
+
+  const [password, setPassword] = useState("");
+  const [deleteAnyway, setDeleteAnyway] = useState(false);
+  const onOpenChange = (visibility: boolean) => {
+    setOpen(visibility);
+    setPassword("");
+    setDeleteAnyway(false);
+  };
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogTrigger asChild>
         <Button
           className={cn(
@@ -89,22 +99,58 @@ export function DeleteWorkerAlert({
                 suppression.
               </span>
             ) : (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Alert supression impossible !</AlertTitle>
-                <AlertDescription>
-                  Vous ne pouvez pas supprimer cet employé car il possède des
-                  bons ou un solde.
-                </AlertDescription>
-              </Alert>
+              <>
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Alert supression impossible !</AlertTitle>
+                  <AlertDescription>
+                    Vous ne pouvez pas supprimer cet employé car il possède des
+                    bons ou un solde.
+                    <Button
+                      type="button"
+                      onClick={() => setDeleteAnyway(true)}
+                      variant="link"
+                      className="px-1.5 py-0 h-min"
+                    >
+                      Supprimer quand même
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+                {deleteAnyway && (
+                  <div className="py-3">
+                    <Label htmlFor="confime-password">Mot de passe</Label>
+                    <Input
+                      id="confime-password"
+                      type="password"
+                      aria-label="confirme-password"
+                      autoComplete="off"
+                      autoSave="false"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <p className="mt-1 text-destructive font-bold">
+                      En continuant vous allez supprimer l'employé, tous ses
+                      versements, tous ses bons et tout son solde, êtes vous sûr
+                      de vouloir continuer ?
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Annuler</AlertDialogCancel>
           <Button
-            onClick={() => mutationDeleteWorker.mutate(worker.id)}
-            disabled={mutationDeleteWorker.isLoading || !canBeDeleted}
+            onClick={() =>
+              mutationDeleteWorker.mutate({
+                workerId: worker.id,
+                password: deleteAnyway ? password : undefined,
+              })
+            }
+            disabled={
+              mutationDeleteWorker.isLoading || (!canBeDeleted && !deleteAnyway)
+            }
           >
             {mutationDeleteWorker.isLoading && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

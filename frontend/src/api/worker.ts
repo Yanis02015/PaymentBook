@@ -20,5 +20,13 @@ export const modifyWorker = async ({
   workerId: string;
 }) => (await MakeRequest.put(`workers/${workerId}`, { json: worker })).json();
 
-export const deleteWorker = async (workerId: string) =>
-  await MakeRequest.delete(`workers/${workerId}`).json();
+export const deleteWorker = async ({
+  workerId,
+  password,
+}: {
+  workerId: string;
+  password?: string;
+}) =>
+  await MakeRequest.delete(`workers/${workerId}`, {
+    json: { password },
+  }).json();

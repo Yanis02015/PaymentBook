@@ -1,6 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { ExpressError } from "../utils/error";
-import { Prisma, WorkerModel } from "../configurations/db";
+import {
+  PaymentModel,
+  Prisma,
+  SoldeModel,
+  VocherModel,
+  WorkerModel,
+} from "../configurations/db";
 import { Worker } from "@prisma/client";
 
 export const createWorker = async (
@@ -58,8 +64,31 @@ export const deleteWorker = async (
 ) => {
   try {
     const { workerId } = req.params;
-    const worker = await Prisma.worker.delete({ where: { id: workerId } });
-    res.status(200).json(worker);
+    const { password } = req.body;
+    const { _count: relations } = await WorkerModel.findUniqueOrThrow({
+      where: { id: workerId },
+      include: {
+        _count: { select: { Payments: true, Soldes: true, Vochers: true } },
+      },
+    });
+    const hasRelation =
+      relations.Payments > 0 || relations.Soldes > 0 || relations.Vochers > 0;
+    if (!password && (typeof password != "string" || hasRelation))
+      throw new ExpressError(
+        "L'employé ne peut pas être supprimer de cette façon, car possede des relations",
+        400
+      );
+
+    if (hasRelation) {
+      if (password != process.env.ADMIN_PASSWORD)
+        throw new ExpressError("Mot de passe incorrecte", 400);
+
+      await SoldeModel.deleteMany({ where: { workerId } });
+      await VocherModel.deleteMany({ where: { workerId } });
+      await PaymentModel.deleteMany({ where: { workerId } });
+    }
+    await WorkerModel.delete({ where: { id: workerId } });
+    res.status(200).json({ message: "Employé supprimé avec succès" });
   } catch (error) {
     next(error);
   }

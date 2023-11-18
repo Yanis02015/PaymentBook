@@ -1,10 +1,11 @@
 import { createPaymentOutOfVocher } from "@/api/payment";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -34,9 +35,10 @@ import { paymentType } from "@/utils/enum";
 import { formatPayment } from "@/utils/functions";
 import { queries } from "@/utils/queryKeys";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { DialogClose } from "@radix-ui/react-dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HTTPError } from "ky";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { PropsWithChildren, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -243,6 +245,21 @@ export const CreatePaymentOutOfVocherDialog = ({
                 </FormItem>
               )}
             />
+
+            <DialogFooter>
+              <DialogClose
+                type="button"
+                className={buttonVariants({ variant: "outline" })}
+              >
+                Fermer
+              </DialogClose>
+              <Button disabled={mutationCreateSolde.isLoading} type="submit">
+                {mutationCreateSolde.isLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Valider
+              </Button>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>
