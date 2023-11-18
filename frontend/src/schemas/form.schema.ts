@@ -46,7 +46,7 @@ export const VocherFormSchema = z.object({
 export const PaymentForMonthSchema = z.object({
   amount: z.coerce
     .number()
-    .min(1000, "La somme du versement doit être superieur à 1 000 DA"),
+    .min(10, "La somme du versement doit être superieur à 10 DA"),
   type: z.enum(["CASH", "GOODS"]),
   description: z
     .string()
