@@ -4,7 +4,6 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
-    "dev": "concurrently \"tsc --watch\" \"nodemon dist/server.js\"",
     "build": "tsc"
   },
   "keywords": [],
@@ -33,7 +32,6 @@
     "@types/node": "^20.5.7",
     "@types/passport": "^1.0.12",
     "@types/passport-local": "^1.0.35",
-    "concurrently": "^8.2.1",
     "prisma": "^5.2.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"

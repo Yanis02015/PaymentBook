@@ -45,8 +45,7 @@ jobs:
 
       - name: Move Prisma Directory
         run: |
-          mkdir -p backend/dist/prisma
-          mv backend/prisma/schema.prisma backend/dist/prisma/schema.prisma
+          cp -r backend/prisma backend/dist/
 
       - name: Build Frontend
         run: |
