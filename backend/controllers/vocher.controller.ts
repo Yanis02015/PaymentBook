@@ -149,6 +149,38 @@ export const createVocherTypes = async (
   }
 };
 
+export const modifyVocherType = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { typeId } = req.params;
+    if (!typeId) throw new ExpressError("L'id est requis", 400);
+    const type = await VocherTypeModel.findFirst({ where: { id: typeId } });
+    if (!type) throw new ExpressError(`Le type n'existe pas`, 404);
+
+    let { name, remuneration } = req.body;
+    if (!name && !remuneration)
+      throw new ExpressError("Aucun champ saisi", 400);
+
+    if (name == type.name || typeof name != "string") name = undefined;
+    if (remuneration == type.remuneration || typeof remuneration != "number")
+      remuneration = undefined;
+
+    if (!name && !remuneration)
+      throw new ExpressError("Aucun modification effectue", 400);
+
+    await VocherTypeModel.update({
+      where: { id: typeId },
+      data: { name, remuneration },
+    });
+    res.status(200).json({ message: "Type mise à jour avec succès" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteVocherTypes = async (
   req: Request,
   res: Response,

@@ -27,5 +27,14 @@ export const createVocherTypes = async (
   vocherType: z.infer<typeof VocherTypeFormSchema>
 ) => await MakeRequest.post("vochers/types", { json: vocherType }).json();
 
+export const modifyVocherType = async ({
+  vocherType,
+  typeId,
+}: {
+  vocherType: z.infer<typeof VocherTypeFormSchema>;
+  typeId: string;
+}) =>
+  await MakeRequest.put(`vochers/types/${typeId}`, { json: vocherType }).json();
+
 export const deleteVocherTypes = async (typeId: string) =>
   await MakeRequest.delete(`vochers/types/${typeId}`).json();

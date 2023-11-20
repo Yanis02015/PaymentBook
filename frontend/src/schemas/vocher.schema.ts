@@ -35,3 +35,6 @@ export const VochersPerMonthSchema = z.object({
 });
 
 export const VochersPerMonthsSchema = z.array(VochersPerMonthSchema);
+
+export type VocherType = z.infer<typeof VocherSchema>;
+export type VocherTypeType = z.infer<typeof VocherTypeSchema>;

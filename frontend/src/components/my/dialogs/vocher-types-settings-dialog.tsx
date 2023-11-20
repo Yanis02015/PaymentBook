@@ -20,18 +20,18 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
+import { VocherTypesList } from "@/components/utils/vocher-types-list";
 import { VocherTypeFormSchema } from "@/schemas/form.schema";
 import { VocherTypesSchema } from "@/schemas/vocher.schema";
-import { formatPayment } from "@/utils/functions";
 import { queries } from "@/utils/queryKeys";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HTTPError } from "ky";
-import { Loader2, Pen, Trash2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { AlertDialog } from "./alert-dialog";
-import { useEffect, useState } from "react";
 
 export const VocherTypesSettingsDialog = ({
   open,
@@ -100,7 +100,7 @@ export const VocherTypesSettingsDialog = ({
   }, [form, open]);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-2xl">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -176,51 +176,15 @@ export const VocherTypesSettingsDialog = ({
                 Créer un nouveau type
               </Button>
             </DialogFooter>
-
-            <Separator orientation="horizontal" />
-            <DialogDescription>Liste des types de bons</DialogDescription>
-
-            <ScrollArea className="max-h-[400px]">
-              <div className="space-y-2">
-                {types
-                  ? types.map((t) => (
-                      <div
-                        key={t.id}
-                        className="flex justify-between bg-muted p-2 rounded-lg"
-                      >
-                        <div className="font-bold grid grid-cols-12 flex-1 gap-2">
-                          <span className="text-sm col-span-4">{t.name}</span>
-                          <span className="text-green-500  col-span-8">
-                            {formatPayment(t.remuneration)}
-                          </span>
-                        </div>
-                        <div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            className="hover:bg-transparent w-auto h-auto p-1 hover:text-green-500"
-                            size="icon"
-                            disabled
-                          >
-                            <Pen size={16} />
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            className="hover:bg-transparent w-auto h-auto p-1 hover:text-destructive"
-                            size="icon"
-                            onClick={() => deleteType(t.id)}
-                          >
-                            <Trash2 size={16} />
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  : "Chargement"}
-              </div>
-            </ScrollArea>
           </form>
         </Form>
+        <div className="space-y-4">
+          <Separator orientation="horizontal" />
+          <DialogDescription>Liste des types de bons</DialogDescription>
+          <ScrollArea className="max-h-[400px]">
+            <VocherTypesList types={types} deleteType={deleteType} />
+          </ScrollArea>
+        </div>
       </DialogContent>
       <AlertDialog
         title="Êtes vous sûr?"
