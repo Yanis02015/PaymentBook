@@ -42,6 +42,7 @@ export const WorkerProfil = ({
   const queryClient = useQueryClient();
 
   const [dialogVisibility, setDialogVisibility] = useState(false);
+  const [showSolde, setShowSolde] = useState(false);
 
   const { toast } = useToast();
   const mutationCreateVocher = useMutation({
@@ -86,7 +87,7 @@ export const WorkerProfil = ({
         <AccordionWorkerInformations worker={worker} />
         <div className="absolute -top-4 right-1.5 flex flex-col">
           <ModifyWorkerDialog worker={worker} className="">
-            <Pen size={17} className="" />
+            <Pen size={17} />
           </ModifyWorkerDialog>
           <DeleteWorkerAlert
             worker={worker}
@@ -143,31 +144,45 @@ export const WorkerProfil = ({
               </p>
             </div>
           )}
-          <CreateSoldeDialog
-            worker={worker}
-            className={buttonVariants({
-              size: "sm",
-              variant: "outline",
-              className: "w-full relative",
-            })}
+          <Button
+            variant="link"
+            onClick={() => setShowSolde((s) => !s)}
+            className="p-0 h-auto w-auto gap-2 text-muted-foreground"
           >
-            <Plus size={17} className="absolute left-4" />
-            <p>Ajouter un solde</p>
-          </CreateSoldeDialog>
-          <CreatePaymentOutOfVocherDialog
-            className={cn(
-              buttonVariants({
-                size: "sm",
-                className: "w-full relative",
-              }),
-              "bg-blue-400 hover:bg-blue-400/90"
-            )}
-            worker={worker}
-            rest={solde?.rest || 0}
-          >
-            <DollarSign size={17} className="absolute left-4" />
-            <p>Effectuer un versement</p>
-          </CreatePaymentOutOfVocherDialog>
+            {showSolde ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
+            {showSolde
+              ? "Cacher les boutons du solde"
+              : "Aficher les boutons du solde"}
+          </Button>
+          {showSolde && (
+            <>
+              <CreateSoldeDialog
+                worker={worker}
+                className={buttonVariants({
+                  size: "sm",
+                  variant: "outline",
+                  className: "w-full relative",
+                })}
+              >
+                <Plus size={17} className="absolute left-4" />
+                <p>Ajouter un solde</p>
+              </CreateSoldeDialog>
+              <CreatePaymentOutOfVocherDialog
+                className={cn(
+                  buttonVariants({
+                    size: "sm",
+                    className: "w-full relative",
+                  }),
+                  "bg-blue-400 hover:bg-blue-400/90"
+                )}
+                worker={worker}
+                rest={solde?.rest || 0}
+              >
+                <DollarSign size={17} className="absolute left-4" />
+                <p>Effectuer un versement</p>
+              </CreatePaymentOutOfVocherDialog>
+            </>
+          )}
         </div>
       </div>
 
