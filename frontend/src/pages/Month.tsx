@@ -1,6 +1,8 @@
 import { getVochersByMonth } from "@/api/vocher";
 import { getWorker } from "@/api/worker";
 import { BannerMonth } from "@/components/my/banner-month";
+import { CreatePaymentForMonthDialog } from "@/components/my/dialogs/create-payment-dialog";
+import { CreateVocherDialog } from "@/components/my/dialogs/create-vocher-dialog";
 import { Button } from "@/components/ui/button";
 import { PaymentType } from "@/schemas/payment.schema";
 import { VocherType } from "@/schemas/vocher.schema";
@@ -10,9 +12,12 @@ import { queries } from "@/utils/queryKeys";
 import { useQuery } from "@tanstack/react-query";
 import { HTTPError } from "ky";
 import { CircleOff, Info, MoveRight, Pen, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 export default function Month() {
+  const [openCreatePayment, setOpenCreatePayment] = useState(false);
+  const [openCreateVocher, setOpenCreateVocher] = useState(false);
   const { id, month } = useParams();
   const date = monthToDate(month || "");
   const { data: worker } = useQuery({
@@ -27,7 +32,7 @@ export default function Month() {
     },
   });
   const { data: vocher } = useQuery({
-    queryKey: [queries.vocherOfMonth],
+    queryKey: [queries.vocherPerMonth, date],
     queryFn: () =>
       getVochersByMonth({
         date: date as Date,
@@ -41,18 +46,40 @@ export default function Month() {
       <BannerMonth vocher={vocher} worker={worker} />
 
       <div className="px-5 pt-5 grid grid-cols-1 md:grid-cols-2 gap-10 max-w-6xl m-auto">
-        <PaymentsList payments={vocher.Payments} />
+        <PaymentsList
+          payments={vocher.Payments}
+          onCreatePayment={() => setOpenCreatePayment(true)}
+        />
 
-        <VochersList vochers={vocher.Vochers} />
+        <VochersList
+          vochers={vocher.Vochers}
+          onCreateVocher={() => setOpenCreateVocher(true)}
+        />
       </div>
+
+      {/* Dialogs */}
+      <CreatePaymentForMonthDialog
+        onOpenChange={setOpenCreatePayment}
+        open={openCreatePayment}
+        vocherPerMonth={vocher}
+        worker={worker}
+      />
+      <CreateVocherDialog
+        defaultDate={date}
+        onOpenChange={setOpenCreateVocher}
+        open={openCreateVocher}
+        worker={worker}
+      />
     </div>
   );
 }
 
 const VochersList = ({
+  onCreateVocher,
   vochers,
   className,
 }: {
+  onCreateVocher: () => void;
   vochers: VocherType[];
   className?: string;
 }) => (
@@ -63,6 +90,7 @@ const VochersList = ({
 
     <div className="space-y-3 pt-3">
       <Button
+        onClick={onCreateVocher}
         className="w-full relative font-semibold uppercase"
         variant="outline"
       >
@@ -126,9 +154,11 @@ const VochersList = ({
 const PaymentsList = ({
   payments,
   className,
+  onCreatePayment,
 }: {
   payments: PaymentType[];
   className?: string;
+  onCreatePayment: () => void;
 }) => (
   <div className={className}>
     <h2 className="font-bold text-xl">
@@ -139,6 +169,7 @@ const PaymentsList = ({
       <Button
         className="w-full relative font-semibold uppercase"
         variant="outline"
+        onClick={onCreatePayment}
       >
         <Plus strokeWidth={2.4} className="absolute left-3" />
         Nouveau versement

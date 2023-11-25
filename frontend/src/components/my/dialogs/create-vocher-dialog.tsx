@@ -1,4 +1,4 @@
-import { getVocherTypes } from "@/api/vocher";
+import { createVocher, getVocherTypes } from "@/api/vocher";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,7 +22,7 @@ import { VocherFormSchema } from "@/schemas/form.schema";
 import { WorkerSchema } from "@/schemas/worker.schema";
 import { queries } from "@/utils/queryKeys";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Settings, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -36,32 +36,55 @@ import {
 } from "../../ui/select";
 import { DatePicker } from "../date-picker";
 import { VocherTypesSettingsDialog } from "./vocher-types-settings-dialog";
+import { useToast } from "@/components/ui/use-toast";
+import { HTTPError } from "ky";
 
 type CreateVocherDialogProps = {
-  isLoadind?: boolean;
-  onSubmit: (vocher: z.infer<typeof VocherFormSchema>) => void;
+  defaultDate?: Date;
   open: boolean;
   onOpenChange: (visibility: boolean) => void;
   worker: z.infer<typeof WorkerSchema>;
 };
 
 export function CreateVocherDialog({
-  isLoadind,
-  onSubmit,
   open,
   onOpenChange,
   worker,
+  defaultDate,
 }: CreateVocherDialogProps) {
   const [vocherTypesDialogVisibility, setVocherTypesDialogVisibility] =
     useState(false);
   const form = useForm<z.infer<typeof VocherFormSchema>>({
     resolver: zodResolver(VocherFormSchema),
     defaultValues: {
-      date: new Date(),
+      date: defaultDate,
       quantity: 0,
       remuneration: 0,
       workerId: "",
       typeId: undefined,
+    },
+  });
+
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const mutationCreateVocher = useMutation({
+    mutationFn: createVocher,
+    onSuccess: () => {
+      queryClient.invalidateQueries([queries.vocherPerMonth]);
+      queryClient.invalidateQueries([queries.yearsWorker]);
+      onOpenChange(false);
+      toast({
+        title: "Mission crée avec succès!",
+        description: `La nouvelle mission du ${worker.fullname} a été crée avec succès.`,
+      });
+    },
+    onError: (error: HTTPError) => {
+      console.log(error);
+      toast({
+        title: "Oh oh, erreur lors de la création du bon",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -97,7 +120,7 @@ export function CreateVocherDialog({
       <DialogContent className="sm:max-w-[550px]">
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit((v) => mutationCreateVocher.mutate(v))}
             className="grid gap-4 py-4"
           >
             <DialogHeader>
@@ -256,8 +279,10 @@ export function CreateVocherDialog({
 
             {/* Actions buttons */}
             <DialogFooter>
-              <Button disabled={isLoadind} type="submit">
-                {isLoadind && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button disabled={mutationCreateVocher.isLoading} type="submit">
+                {mutationCreateVocher.isLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Ajouter la mission
               </Button>
             </DialogFooter>

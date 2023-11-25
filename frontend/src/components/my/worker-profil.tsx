@@ -1,11 +1,10 @@
 import { getWorkerSoldeAmount } from "@/api/solde";
-import { createVocher } from "@/api/vocher";
 import { cn } from "@/lib/utils";
 import { WorkerSchema, WorkerType } from "@/schemas/worker.schema";
 import { formatPayment, getFormatedDate } from "@/utils/functions";
 import { queries } from "@/utils/queryKeys";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   ChevronDown,
   ChevronUp,
@@ -18,14 +17,13 @@ import {
 import { useState } from "react";
 import { z } from "zod";
 import { Button, buttonVariants } from "../ui/button";
-import { useToast } from "../ui/use-toast";
 import { SimpleTooltip } from "../utils/simple-tooltip";
+import { DeleteWorkerAlert } from "./alerts/delete-worker-alert";
+import { CreatePaymentOutOfVocherDialog } from "./dialogs/create-payment-out-of-vocher-dialog";
+import { CreateSoldeDialog } from "./dialogs/create-solde-dialog";
 import { CreateVocherDialog } from "./dialogs/create-vocher-dialog";
 import { ModifyWorkerDialog } from "./dialogs/modify-worker";
 import { NotFoundBadge } from "./not-found-badge";
-import { CreateSoldeDialog } from "./dialogs/create-solde-dialog";
-import { CreatePaymentOutOfVocherDialog } from "./dialogs/create-payment-out-of-vocher-dialog";
-import { DeleteWorkerAlert } from "./alerts/delete-worker-alert";
 
 const profilElementClassName =
   "bg-slate-100 flex justify-between text-sm items-center p-2 rounded-lg";
@@ -39,23 +37,8 @@ export const WorkerProfil = ({
   className?: string;
   vocherLength: number;
 }) => {
-  const queryClient = useQueryClient();
-
   const [dialogVisibility, setDialogVisibility] = useState(false);
   const [showSolde, setShowSolde] = useState(false);
-
-  const { toast } = useToast();
-  const mutationCreateVocher = useMutation({
-    mutationFn: createVocher,
-    onSuccess: () => {
-      queryClient.invalidateQueries([queries.vocherPerMonth]);
-      setDialogVisibility(false);
-      toast({
-        title: "Mission crée avec succès!",
-        description: `La nouvelle mission du ${worker.fullname} a été crée avec succès.`,
-      });
-    },
-  });
 
   const { data: solde } = useQuery({
     queryKey: [queries.soldes, queries.soldeAmount, worker.id],
@@ -188,7 +171,6 @@ export const WorkerProfil = ({
 
       <CreateVocherDialog
         onOpenChange={setDialogVisibility}
-        onSubmit={mutationCreateVocher.mutate}
         open={dialogVisibility}
         worker={worker}
       />

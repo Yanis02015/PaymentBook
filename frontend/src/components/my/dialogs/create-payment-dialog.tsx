@@ -37,10 +37,13 @@ import {
 } from "../../ui/select";
 import { Textarea } from "../../ui/textarea";
 import { PaymentPayRest } from "../payment-pay-rest";
+import { createPayment } from "@/api/payment";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { queries } from "@/utils/queryKeys";
+import { useToast } from "@/components/ui/use-toast";
+import { HTTPError } from "ky";
 
 type CreatePaymentForMonthDialogProps = {
-  isLoadind?: boolean;
-  onSubmit: (payment: z.infer<typeof PaymentForMonthSchema>) => void;
   open: boolean;
   onOpenChange: (visibility: boolean) => void;
   worker: z.infer<typeof WorkerSchema>;
@@ -48,8 +51,6 @@ type CreatePaymentForMonthDialogProps = {
 };
 
 export const CreatePaymentForMonthDialog = ({
-  isLoadind,
-  onSubmit,
   open,
   onOpenChange,
   worker,
@@ -64,6 +65,30 @@ export const CreatePaymentForMonthDialog = ({
       month: vocherPerMonth.date,
       type: "CASH",
       workerId: worker.id,
+    },
+  });
+  const { toast } = useToast();
+
+  const queryClient = useQueryClient();
+  const mutationCreatePayment = useMutation({
+    mutationFn: createPayment,
+    onSuccess: () => {
+      queryClient.invalidateQueries([queries.vocherPerMonth]);
+      queryClient.invalidateQueries([queries.payments]);
+      queryClient.invalidateQueries([queries.yearsWorker]);
+      onOpenChange(false);
+      toast({
+        title: "Payement effectué avec succès!",
+        description: `Le versement pour le mois ${vocherPerMonth.month} de Mr. ${worker.fullname} a été effectué avec succès.`,
+      });
+    },
+    onError: (error: HTTPError) => {
+      console.log(error);
+      toast({
+        title: "Oh oh, erreur durant le versement",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -88,7 +113,7 @@ export const CreatePaymentForMonthDialog = ({
   const verifyBeforeSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (form.getValues("amount") > vocherPerMonth.rest) return;
-    form.handleSubmit(onSubmit)(event);
+    form.handleSubmit((p) => mutationCreatePayment.mutate(p))(event);
   };
   return (
     <Dialog modal open={open} onOpenChange={onOpenChange}>
@@ -238,8 +263,10 @@ export const CreatePaymentForMonthDialog = ({
 
             {/* Actions buttons */}
             <DialogFooter>
-              <Button disabled={isLoadind} type="submit">
-                {isLoadind && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button disabled={mutationCreatePayment.isLoading} type="submit">
+                {mutationCreatePayment.isLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Valider le versement
               </Button>
             </DialogFooter>

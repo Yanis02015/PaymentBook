@@ -1,4 +1,3 @@
-import { createPayment } from "@/api/payment";
 import {
   Tooltip,
   TooltipContent,
@@ -7,11 +6,11 @@ import {
 } from "@/components/ui/tooltip";
 import { VochersPerMonthSchema } from "@/schemas/vocher.schema";
 import { WorkerSchema } from "@/schemas/worker.schema";
+import "@/styles/component.css";
 import { formatPayment, getFormatedDate } from "@/utils/functions";
-import { queries } from "@/utils/queryKeys";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, DollarSign, Maximize2 } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Carousel, Slide, Slider, cn } from "react-scroll-snap-anime-slider";
 import { z } from "zod";
 import { Badge } from "../ui/badge";
@@ -24,11 +23,8 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { useToast } from "../ui/use-toast";
 import { CreatePaymentForMonthDialog } from "./dialogs/create-payment-dialog";
 import { PaymentPayRest } from "./payment-pay-rest";
-import "@/styles/component.css";
-import { Link } from "react-router-dom";
 
 const getThemeByVocher = (rest: number) => {
   if (rest > 0) return "bg-teal-200/20";
@@ -44,21 +40,6 @@ export const PaymentMonthCard = ({
   worker: z.infer<typeof WorkerSchema>;
 }) => {
   const [openDialogCreatePayment, setOpenDialogCreatePayment] = useState(false);
-  const { toast } = useToast();
-
-  const queryClient = useQueryClient();
-  const mutationCreatePayment = useMutation({
-    mutationFn: createPayment,
-    onSuccess: () => {
-      queryClient.invalidateQueries([queries.vocherPerMonth]);
-      queryClient.invalidateQueries([queries.payments]);
-      setOpenDialogCreatePayment(false);
-      toast({
-        title: "Payement effectué avec succès!",
-        description: `Le versement pour le mois ${vocherPerMonth.month} de Mr. ${worker.fullname} a été effectué avec succès.`,
-      });
-    },
-  });
 
   const link = `${
     vocherPerMonth.date.getMonth() + 1
@@ -172,7 +153,6 @@ export const PaymentMonthCard = ({
       {worker && (
         <CreatePaymentForMonthDialog
           vocherPerMonth={vocherPerMonth}
-          onSubmit={mutationCreatePayment.mutate}
           onOpenChange={setOpenDialogCreatePayment}
           open={openDialogCreatePayment}
           worker={worker}
