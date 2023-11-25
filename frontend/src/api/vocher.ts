@@ -1,6 +1,7 @@
 import { VocherFormSchema, VocherTypeFormSchema } from "@/schemas/form.schema";
 import {
   VocherTypesSchema,
+  VochersPerMonthSchema,
   VochersPerMonthsSchema,
   VochersSchema,
 } from "@/schemas/vocher.schema";
@@ -38,3 +39,16 @@ export const modifyVocherType = async ({
 
 export const deleteVocherTypes = async (typeId: string) =>
   await MakeRequest.delete(`vochers/types/${typeId}`).json();
+
+export const getVochersByMonth = async ({
+  date,
+  workerId,
+}: {
+  date: Date;
+  workerId: string;
+}) =>
+  await MakeRequest(`vochers/month/${workerId}`, {
+    searchParams: { date: date.toISOString() },
+  })
+    .json()
+    .then(VochersPerMonthSchema.parse);

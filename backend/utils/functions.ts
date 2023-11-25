@@ -9,15 +9,15 @@ type VocherPerMonth = {
   rest: number;
   Vochers: Vocher[];
   Payments: Payment[];
-}[];
+};
 
 export const groupVocher = (
   vochers: Vocher[],
   payements: Payment[]
-): VocherPerMonth => {
+): VocherPerMonth[] => {
   if (!vochers) return [];
 
-  const vocherPerMonth: VocherPerMonth = [];
+  const vocherPerMonth: VocherPerMonth[] = [];
 
   vochers.forEach((vocher) => {
     let moisAnnee = formatMonthYearName(getMonthLimits(vocher.date).begin);
@@ -75,7 +75,7 @@ export const groupVocher = (
   });
 };
 
-const formatMonthYearName = (date: Date) => {
+export const formatMonthYearName = (date: Date) => {
   const moisAnnee = `${date.toLocaleString("fr-FR", {
     month: "long",
   })} ${date.getFullYear()}`;
@@ -92,7 +92,7 @@ export const getMonthLimits = (date: Date) => {
   const begin = new Date(anneeRecherchee, moisRecherche, 1);
 
   // Trouver le dernier jour du mois suivant (pour obtenir la fin du mois actuel)
-  const end = new Date(anneeRecherchee, moisRecherche + 1, 0);
+  const end = new Date(anneeRecherchee, moisRecherche + 1, 1, 0, 0, -1);
 
   return {
     begin,
@@ -110,3 +110,7 @@ export const getYearLimits = (year: string) => {
 };
 
 export const getBeginOfYear = (year: number) => new Date(year, 0, 1);
+
+export function isDateValid(dateStr: string) {
+  return !isNaN(new Date(dateStr).getTime());
+}

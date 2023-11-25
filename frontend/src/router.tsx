@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Worker from "./pages/Worker";
 import Workers from "./pages/Workers";
 import { PATHS } from "./utils/paths";
+import Month from "./pages/Month";
 
 export const router = () =>
   createBrowserRouter([
@@ -30,6 +31,10 @@ export const router = () =>
         {
           path: PATHS.WORKER,
           element: <Worker />,
+        },
+        {
+          path: PATHS.WORKER_MONTH,
+          element: <Month />,
         },
       ],
     },

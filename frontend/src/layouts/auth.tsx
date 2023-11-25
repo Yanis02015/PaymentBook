@@ -2,11 +2,12 @@ import { refresh } from "@/api/auth";
 import { LogoutButton } from "@/components/my/logout";
 import { Error as ErrorComponent } from "@/components/utils/error";
 import { Loading } from "@/components/utils/loading";
+import { cn } from "@/lib/utils";
 import { PATHS } from "@/utils/paths";
 import { queries } from "@/utils/queryKeys";
 import { useQuery } from "@tanstack/react-query";
 import { HTTPError } from "ky";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, matchPath, useLocation } from "react-router-dom";
 
 export default function AuthLayout() {
   const { isError, isLoading, error, isFetching } = useQuery({
@@ -15,6 +16,7 @@ export default function AuthLayout() {
     refetchOnWindowFocus: false,
     retry: false,
   });
+  const location = useLocation();
 
   if (isLoading || isFetching) return <Loading />;
 
@@ -32,11 +34,18 @@ export default function AuthLayout() {
     return <ErrorComponent className="pt-20" />;
   }
 
+  const showContainer =
+    [PATHS.WORKER_MONTH].findIndex((path) =>
+      matchPath(path, location.pathname)
+    ) === -1;
+
   return (
-    <div className="container pb-5">
-      <div className="flex justify-end py-4">
-        <LogoutButton />
-      </div>
+    <div className={cn("pb-5", showContainer && "container")}>
+      {showContainer && (
+        <div className="flex justify-end py-4">
+          <LogoutButton />
+        </div>
+      )}
       <Outlet />
     </div>
   );

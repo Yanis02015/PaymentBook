@@ -6,8 +6,15 @@ import {
   WorkerModel,
 } from "../configurations/db";
 import { ExpressError } from "../utils/error";
-import { getMonthLimits, getYearLimits, groupVocher } from "../utils/functions";
+import {
+  formatMonthYearName,
+  getMonthLimits,
+  getYearLimits,
+  groupVocher,
+  isDateValid,
+} from "../utils/functions";
 import { Vocher } from "@prisma/client";
+import { getPaymentsOfMonth } from "./payment.controller";
 
 export const getVochers = async (
   req: Request,
@@ -199,6 +206,43 @@ export const deleteVocherTypes = async (
   }
 };
 
+export const getWorkerMonth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let { date: dateStr } = req.query;
+    const { workerId } = req.params;
+    if (typeof dateStr != "string" || !isDateValid(dateStr))
+      throw new ExpressError("Date mal formé", 400);
+    await WorkerModel.findUniqueOrThrow({ where: { id: workerId } });
+
+    const date = new Date(dateStr);
+    const paymentsOfMonth = await getPaymentsOfMonth(workerId, date);
+    const vochersOfMonth = await getVochersOfMonth(workerId, date);
+
+    let result = groupVocher(vochersOfMonth, paymentsOfMonth);
+    if (result.length == 0)
+      result.push({
+        month: formatMonthYearName(date),
+        date,
+        pay: 0,
+        Payments: [],
+        rest: 0,
+        total: 0,
+        Vochers: [],
+      });
+    if (result.length != 1) {
+      console.log(result);
+      throw new ExpressError("Taille du tableau non valide", 500);
+    }
+    res.status(200).json(result[0]);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Function
 export const getVochersOfMonth = async (
   workerId: string,
@@ -213,6 +257,10 @@ export const getVochersOfMonth = async (
         gte: begin,
         lte: end,
       },
+    },
+    include: { Type: true },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 };

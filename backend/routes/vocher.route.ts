@@ -8,6 +8,7 @@ import {
   createVocherTypes,
   deleteVocherTypes,
   modifyVocherType,
+  getWorkerMonth,
 } from "../controllers/vocher.controller";
 import { isAuthenticated } from "../middleware/auth";
 
@@ -15,6 +16,7 @@ export const vocherRouter = express.Router();
 
 vocherRouter.get("/", isAuthenticated, getVochers);
 vocherRouter.get("/worker/:workerId", isAuthenticated, getWorkerVochers);
+vocherRouter.get("/month/:workerId", isAuthenticated, getWorkerMonth);
 vocherRouter.post("/", isAuthenticated, createVocher);
 
 vocherRouter.get("/types", isAuthenticated, getVocherTypes);

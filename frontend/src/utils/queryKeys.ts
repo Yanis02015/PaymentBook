@@ -5,6 +5,7 @@ export const queries = {
   workers: "workers",
   yearsWorker: "yearsWorker",
   vocherPerMonth: "vocherPerMonth",
+  vocherOfMonth: "vocherOfMonth",
   vocherTypes: "vocherTypes",
   payments: "payments",
   soldes: "soldes",

@@ -10,12 +10,12 @@ import { WorkerSchema } from "@/schemas/worker.schema";
 import { formatPayment, getFormatedDate } from "@/utils/functions";
 import { queries } from "@/utils/queryKeys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, DollarSign } from "lucide-react";
+import { AlertTriangle, DollarSign, Maximize2 } from "lucide-react";
 import { useState } from "react";
 import { Carousel, Slide, Slider, cn } from "react-scroll-snap-anime-slider";
 import { z } from "zod";
 import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import {
   Card,
   CardContent,
@@ -27,6 +27,8 @@ import {
 import { useToast } from "../ui/use-toast";
 import { CreatePaymentForMonthDialog } from "./dialogs/create-payment-dialog";
 import { PaymentPayRest } from "./payment-pay-rest";
+import "@/styles/component.css";
+import { Link } from "react-router-dom";
 
 const getThemeByVocher = (rest: number) => {
   if (rest > 0) return "bg-teal-200/20";
@@ -58,11 +60,15 @@ export const PaymentMonthCard = ({
     },
   });
 
+  const link = `${
+    vocherPerMonth.date.getMonth() + 1
+  }-${vocherPerMonth.date.getFullYear()}`;
+
   return (
     <Card
       className={cn(
         getThemeByVocher(vocherPerMonth.rest),
-        "border-none relative"
+        "border-none relative hover:shadow-lg transition-all month-payment-card"
       )}
     >
       <CardHeader>
@@ -172,6 +178,20 @@ export const PaymentMonthCard = ({
           worker={worker}
         />
       )}
+
+      <Link
+        to={link}
+        className={cn(
+          buttonVariants({
+            size: "icon",
+            variant: "ghost",
+            className:
+              "absolute top-3 right-3 maximize-icon transition-all ease-out duration-200 hover:bg-transparent hover:text-green-500 lg:opacity-0 lg:text-foreground text-muted-foreground",
+          })
+        )}
+      >
+        <Maximize2 />
+      </Link>
     </Card>
   );
 };

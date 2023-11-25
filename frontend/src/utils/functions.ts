@@ -55,3 +55,14 @@ export const formatPayment = (payment: number | string) => {
       .replace(".", ",") + "\u00A0DA"
   );
 };
+
+export const monthToDate = (monthYear: string) => {
+  const tab = monthYear.split("-");
+  if (tab.length != 2) return;
+  const month = Number(tab[0]);
+  const year = Number(tab[1]);
+  if (!Number.isInteger(month) || !Number.isInteger(year)) return;
+  if (month > 12 || month < 1 || year < 1) return;
+
+  return new Date(year, month - 1);
+};

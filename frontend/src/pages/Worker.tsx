@@ -91,7 +91,7 @@ export default function Worker() {
       <div className="py-3"></div>
 
       <div className={cn("flex flex-col-reverse gap-4", "md:flex-row")}>
-        <div className="flex-1 max-w-full overflow-hidden">
+        <div className="flex-1 max-w-full overflow-hidden -m-5 p-5">
           {/* Year list */}
           {years && (
             <YearsCaroussel
