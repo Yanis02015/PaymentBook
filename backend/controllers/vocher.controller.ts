@@ -141,9 +141,9 @@ export const createVocherTypes = async (
       throw new ExpressError("Le nom du bon ne peut pas être vide", 400);
     if (!remuneration)
       throw new ExpressError("La rémunération est requis", 400);
-    if (remuneration < 500)
+    if (remuneration < 10)
       throw new ExpressError(
-        "La rémunération ne peux pas être inferieur à 500 Da",
+        "La rémunération ne peux pas être inferieur à 10 Da",
         400
       );
     const type = await VocherTypeModel.findFirst({ where: { name } });
