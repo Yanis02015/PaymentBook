@@ -60,3 +60,6 @@ export const modifyVocher = async ({
   vocherId: string;
   vocher: z.infer<typeof VocherFormSchema>;
 }) => await MakeRequest.put(`vochers/${vocherId}`, { json: vocher }).json();
+
+export const deleteVocher = async (vocherId: string) =>
+  await MakeRequest.delete(`vochers/${vocherId}`).json();

@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
+import { PropsWithChildren } from "react";
 
 type AlertDialogType = {
   open: boolean;
@@ -19,13 +20,14 @@ type AlertDialogType = {
 };
 
 export function AlertDialog({
+  children,
   open,
   title,
   description,
   onAccept,
   onRefusal,
   isLoading,
-}: AlertDialogType) {
+}: PropsWithChildren<AlertDialogType>) {
   return (
     <Dialog open={open} onOpenChange={onRefusal}>
       <DialogContent>
@@ -33,6 +35,7 @@ export function AlertDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
+        {children}
         <DialogFooter>
           <Button variant="outline" onClick={onRefusal}>
             Annuler

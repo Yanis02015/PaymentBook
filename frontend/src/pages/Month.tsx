@@ -3,6 +3,7 @@ import { getWorker } from "@/api/worker";
 import { BannerMonth } from "@/components/my/banner-month";
 import { CreatePaymentForMonthDialog } from "@/components/my/dialogs/create-payment-dialog";
 import { CreateVocherDialog } from "@/components/my/dialogs/create-vocher-dialog";
+import { DeleteVocherAlert } from "@/components/my/dialogs/month/delete-vocher-alert";
 import { UpdateVocherDialog } from "@/components/my/dialogs/month/update-vocher-dialog";
 import { Button } from "@/components/ui/button";
 import { PaymentType } from "@/schemas/payment.schema";
@@ -85,6 +86,7 @@ const VochersList = ({
   className?: string;
 }) => {
   const [openUpdate, setOpenUpdate] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
   const [selectedVocherId, setSelectedVocherId] = useState("");
   const selectedVocher = vochers.find((v) => v.id == selectedVocherId);
   return (
@@ -106,9 +108,13 @@ const VochersList = ({
         {vochers.map((v) => (
           <VocherItem
             key={v.id}
-            onSelectVocher={() => {
+            onUpdateVocher={() => {
               setSelectedVocherId(v.id);
               setOpenUpdate(true);
+            }}
+            onDeleteVocher={() => {
+              setSelectedVocherId(v.id);
+              setOpenDelete(true);
             }}
             vocher={v}
           />
@@ -121,20 +127,36 @@ const VochersList = ({
           vocher={selectedVocher}
         />
       )}
+      {selectedVocher && (
+        <DeleteVocherAlert
+          open={openDelete}
+          setOpen={setOpenDelete}
+          vocher={selectedVocher}
+        />
+      )}
     </div>
   );
 };
 
 export const VocherItem = ({
   vocher,
-  onSelectVocher,
+  onUpdateVocher,
+  onDeleteVocher,
   hideActions,
 }: {
   vocher: VocherType;
   hideActions?: boolean;
 } & (
-  | { onSelectVocher: () => void; hideActions?: false }
-  | { hideActions: true; onSelectVocher?: undefined }
+  | {
+      onUpdateVocher: () => void;
+      hideActions?: false;
+      onDeleteVocher: () => void;
+    }
+  | {
+      hideActions: true;
+      onUpdateVocher?: undefined;
+      onDeleteVocher?: undefined;
+    }
 )) => (
   <div key={vocher.id} className="bg-red-50 shadow rounded-lg py-2 px-3">
     <div className="flex justify-between items-center">
@@ -158,7 +180,7 @@ export const VocherItem = ({
             className="p-0 h-auto w-auto hover:bg-transparent"
             variant="ghost"
             size="icon"
-            onClick={onSelectVocher}
+            onClick={onUpdateVocher}
           >
             <Pen className="h-5 w-5 hover:text-green-400" strokeWidth={2.4} />
           </Button>
@@ -166,6 +188,7 @@ export const VocherItem = ({
             className="p-0 h-auto w-auto hover:bg-transparent"
             variant="ghost"
             size="icon"
+            onClick={onDeleteVocher}
           >
             <Trash2
               className="hovh-5 w-5 hover:text-destructive"

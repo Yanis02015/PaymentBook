@@ -304,3 +304,17 @@ export const modifyVocher = async (
     next(error);
   }
 };
+
+export const deleteVocher = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { vocherId } = req.params;
+    await VocherModel.delete({ where: { id: vocherId } });
+    res.status(200).json({ message: "Mission supprimé" });
+  } catch (error) {
+    next(error);
+  }
+};
