@@ -9,6 +9,7 @@ import {
   deleteVocherTypes,
   modifyVocherType,
   getWorkerMonth,
+  modifyVocher,
 } from "../controllers/vocher.controller";
 import { isAuthenticated } from "../middleware/auth";
 
@@ -18,6 +19,7 @@ vocherRouter.get("/", isAuthenticated, getVochers);
 vocherRouter.get("/worker/:workerId", isAuthenticated, getWorkerVochers);
 vocherRouter.get("/month/:workerId", isAuthenticated, getWorkerMonth);
 vocherRouter.post("/", isAuthenticated, createVocher);
+vocherRouter.put("/:vocherId", isAuthenticated, modifyVocher);
 
 vocherRouter.get("/types", isAuthenticated, getVocherTypes);
 vocherRouter.post("/types", isAuthenticated, createVocherTypes);

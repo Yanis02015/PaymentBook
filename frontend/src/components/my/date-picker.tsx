@@ -43,10 +43,12 @@ export const DatePicker = ({
       </PopoverTrigger>
       <PopoverContent side="top" className="w-auto p-0">
         <Calendar
+          className="min-h-[350px]"
           mode="single"
           selected={date}
           locale={fr}
           onSelect={(d) => d && setDate(d)}
+          defaultMonth={date}
           initialFocus
         />
       </PopoverContent>

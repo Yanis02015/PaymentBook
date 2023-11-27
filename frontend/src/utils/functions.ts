@@ -66,3 +66,27 @@ export const monthToDate = (monthYear: string) => {
 
   return new Date(year, month - 1);
 };
+
+export const inputTextToValidPrice = (value: string) => {
+  if (!value) return "0";
+  if (value.startsWith("0")) value = value.replace(/^0+/, "");
+
+  value = value.replace(/,/g, ".");
+  console.log(value);
+
+  if (value && !value.match(/^\d{1,}(\.\d{0,4})?$/)) return;
+  return value || undefined;
+};
+
+export const handleChangeNumberInput = (
+  event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  onChange: (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void
+) => {
+  const newValue = inputTextToValidPrice(event.target.value);
+  if (!newValue) return;
+  event.target.value = newValue;
+
+  onChange(event);
+};

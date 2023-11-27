@@ -3,6 +3,7 @@ import { getWorker } from "@/api/worker";
 import { BannerMonth } from "@/components/my/banner-month";
 import { CreatePaymentForMonthDialog } from "@/components/my/dialogs/create-payment-dialog";
 import { CreateVocherDialog } from "@/components/my/dialogs/create-vocher-dialog";
+import { UpdateVocherDialog } from "@/components/my/dialogs/month/update-vocher-dialog";
 import { Button } from "@/components/ui/button";
 import { PaymentType } from "@/schemas/payment.schema";
 import { VocherType } from "@/schemas/vocher.schema";
@@ -82,71 +83,107 @@ const VochersList = ({
   onCreateVocher: () => void;
   vochers: VocherType[];
   className?: string;
-}) => (
-  <div className={className}>
-    <h2 className="font-bold text-xl">
-      Liste des bons du mois ({vochers.length})
-    </h2>
+}) => {
+  const [openUpdate, setOpenUpdate] = useState(false);
+  const [selectedVocherId, setSelectedVocherId] = useState("");
+  const selectedVocher = vochers.find((v) => v.id == selectedVocherId);
+  return (
+    <div className={className}>
+      <h2 className="font-bold text-xl">
+        Liste des bons du mois ({vochers.length})
+      </h2>
 
-    <div className="space-y-3 pt-3">
-      <Button
-        onClick={onCreateVocher}
-        className="w-full relative font-semibold uppercase"
-        variant="outline"
-      >
-        <Plus strokeWidth={2.4} className="absolute left-3" />
-        Nouveau bon
-      </Button>
-      {vochers.length == 0 && <NoVochers content="Aucun bon pour ce mois" />}
-      {vochers.map((v) => (
-        <div key={v.id} className="bg-red-50 shadow rounded-lg py-2 px-3">
-          <div className="flex justify-between items-center">
-            <h3 className="font-bold text-lg">{v.Type?.name}</h3>
-            <div className="text-muted-foreground flex gap-1.5 items-center">
-              <Button
-                className="p-0 h-auto w-auto hover:bg-transparent"
-                variant="ghost"
-                size="icon"
-              >
-                <Info
-                  className="h-5 w-5 hover:text-blue-600"
-                  strokeWidth={2.4}
-                />
-              </Button>
-              <Button
-                className="p-0 h-auto w-auto hover:bg-transparent"
-                variant="ghost"
-                size="icon"
-              >
-                <Pen
-                  className="h-5 w-5 hover:text-green-400"
-                  strokeWidth={2.4}
-                />
-              </Button>
-              <Button
-                className="p-0 h-auto w-auto hover:bg-transparent"
-                variant="ghost"
-                size="icon"
-              >
-                <Trash2
-                  className="hovh-5 w-5 hover:text-destructive"
-                  strokeWidth={2.4}
-                />
-              </Button>
-            </div>
-          </div>
-          <div className="grid grid-cols-12 items-center font-semibold">
-            <span className="col-span-6">
-              {v.quantity} <span className="text-destructive"> x </span>{" "}
-              {formatPayment(v.remuneration)}
-            </span>
-            <MoveRight strokeWidth={3} />
-            <span className="text-right col-span-5 text-blue-700 font-bold">
-              {formatPayment(v.remuneration * v.quantity)}
-            </span>
-          </div>
+      <div className="space-y-3 pt-3">
+        <Button
+          onClick={onCreateVocher}
+          className="w-full relative font-semibold uppercase"
+          variant="outline"
+        >
+          <Plus strokeWidth={2.4} className="absolute left-3" />
+          Nouveau bon
+        </Button>
+        {vochers.length == 0 && <NoVochers content="Aucun bon pour ce mois" />}
+        {vochers.map((v) => (
+          <VocherItem
+            key={v.id}
+            onSelectVocher={() => {
+              setSelectedVocherId(v.id);
+              setOpenUpdate(true);
+            }}
+            vocher={v}
+          />
+        ))}
+      </div>
+      {selectedVocher && (
+        <UpdateVocherDialog
+          open={openUpdate}
+          setOpen={setOpenUpdate}
+          vocher={selectedVocher}
+        />
+      )}
+    </div>
+  );
+};
+
+export const VocherItem = ({
+  vocher,
+  onSelectVocher,
+  hideActions,
+}: {
+  vocher: VocherType;
+  hideActions?: boolean;
+} & (
+  | { onSelectVocher: () => void; hideActions?: false }
+  | { hideActions: true; onSelectVocher?: undefined }
+)) => (
+  <div key={vocher.id} className="bg-red-50 shadow rounded-lg py-2 px-3">
+    <div className="flex justify-between items-center">
+      <h3 className="font-bold text-lg">
+        {vocher.Type?.name}{" "}
+        <span className="text-sm text-muted-foreground font-normal ml-2">
+          {getFormatedDate(vocher.date).simpleDateWithDayWeek}{" "}
+          {getFormatedDate(vocher.date).year}
+        </span>
+      </h3>
+      {!hideActions && (
+        <div className="text-muted-foreground flex gap-1.5 items-center">
+          <Button
+            className="p-0 h-auto w-auto hover:bg-transparent"
+            variant="ghost"
+            size="icon"
+          >
+            <Info className="h-5 w-5 hover:text-blue-600" strokeWidth={2.4} />
+          </Button>
+          <Button
+            className="p-0 h-auto w-auto hover:bg-transparent"
+            variant="ghost"
+            size="icon"
+            onClick={onSelectVocher}
+          >
+            <Pen className="h-5 w-5 hover:text-green-400" strokeWidth={2.4} />
+          </Button>
+          <Button
+            className="p-0 h-auto w-auto hover:bg-transparent"
+            variant="ghost"
+            size="icon"
+          >
+            <Trash2
+              className="hovh-5 w-5 hover:text-destructive"
+              strokeWidth={2.4}
+            />
+          </Button>
         </div>
-      ))}
+      )}
+    </div>
+    <div className="grid grid-cols-12 items-center font-semibold">
+      <span className="col-span-6">
+        {vocher.quantity} <span className="text-destructive"> x </span>{" "}
+        {formatPayment(vocher.remuneration)}
+      </span>
+      <MoveRight strokeWidth={3} />
+      <span className="text-right col-span-5 text-blue-700 font-bold">
+        {formatPayment(vocher.remuneration * vocher.quantity)}
+      </span>
     </div>
   </div>
 );

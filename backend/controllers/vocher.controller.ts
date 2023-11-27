@@ -264,3 +264,43 @@ export const getVochersOfMonth = async (
     },
   });
 };
+
+export const modifyVocher = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { vocherId } = req.params;
+    const { remuneration, quantity, typeId, date } = req.body;
+    if (
+      (!!remuneration && typeof remuneration != "number") ||
+      (!!quantity && typeof quantity != "number") ||
+      (!!typeId && typeof typeId != "string") ||
+      (!!date && typeof date != "string")
+    )
+      throw new ExpressError("Types error", 400);
+
+    if (typeId)
+      await VocherTypeModel.findUniqueOrThrow({ where: { id: typeId } });
+    if (date && !isDateValid(date))
+      throw new ExpressError("Date mal formé", 400);
+
+    if (remuneration && remuneration < 10)
+      throw new ExpressError(
+        "La rémuneration ne peut pas être inferieur à 10DA",
+        400
+      );
+    if (quantity && quantity < 1)
+      throw new ExpressError("L'quantité ne peut pas être inferieur à 1", 400);
+
+    await VocherModel.update({
+      where: { id: vocherId },
+      data: { date, quantity, remuneration, typeId },
+    });
+
+    res.status(200).json({ message: "Bon modifié avec succès" });
+  } catch (error) {
+    next(error);
+  }
+};

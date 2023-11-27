@@ -52,3 +52,11 @@ export const getVochersByMonth = async ({
   })
     .json()
     .then(VochersPerMonthSchema.parse);
+
+export const modifyVocher = async ({
+  vocherId,
+  vocher,
+}: {
+  vocherId: string;
+  vocher: z.infer<typeof VocherFormSchema>;
+}) => await MakeRequest.put(`vochers/${vocherId}`, { json: vocher }).json();
