@@ -1,7 +1,7 @@
 import { getYearsOfWorker } from "@/api/utils";
 import { getWorkerVochers } from "@/api/vocher";
 import { getWorker } from "@/api/worker";
-import { MissionNotFound } from "@/components/my/404/mission-not-found";
+import { NotFound } from "@/components/my/404/mission-not-found";
 import { PaymentMonthCard } from "@/components/my/month-payment-card";
 import { PaymentMonthCardSheleton } from "@/components/my/skeletons/payment-month-card-sheleton";
 import { WorkerProfil } from "@/components/my/worker-profil";
@@ -120,7 +120,7 @@ export default function Worker() {
                 />
               ))}
               {vochers.length == 0 && (
-                <MissionNotFound
+                <NotFound
                   className="pt-20"
                   message={
                     years?.length == 0 && !Number(searchParams.get("year"))

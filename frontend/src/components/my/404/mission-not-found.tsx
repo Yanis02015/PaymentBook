@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PackageOpen } from "lucide-react";
 
-export const MissionNotFound = ({
+export const NotFound = ({
   message,
   title,
   onClick,

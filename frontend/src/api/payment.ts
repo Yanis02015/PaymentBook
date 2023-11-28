@@ -12,3 +12,6 @@ export const createPayment = async (
 export const createPaymentOutOfVocher = async (
   payment: z.infer<typeof PaymentOutOfVocherFormSchema>
 ) => await MakeRequest.post("payments/out-of-vocher", { json: payment }).json();
+
+export const deletePayment = async (paymentId: string) =>
+  await MakeRequest.delete(`payments/${paymentId}`).json();

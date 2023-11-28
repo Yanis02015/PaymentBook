@@ -33,6 +33,7 @@ model Vocher {
   remuneration Decimal
   quantity     Int
   date         DateTime   @default(now())
+  description  String?
   workerId     String
   Worker       Worker     @relation(fields: [workerId], references: [id])
   typeId       String

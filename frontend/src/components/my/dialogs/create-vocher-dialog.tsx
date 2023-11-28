@@ -38,6 +38,7 @@ import { DatePicker } from "../date-picker";
 import { VocherTypesSettingsDialog } from "./vocher-types-settings-dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { HTTPError } from "ky";
+import { Textarea } from "@/components/ui/textarea";
 
 type CreateVocherDialogProps = {
   defaultDate?: Date;
@@ -61,6 +62,7 @@ export function CreateVocherDialog({
       quantity: 0,
       remuneration: 0,
       workerId: "",
+      description: "",
       typeId: undefined,
     },
   });
@@ -117,7 +119,7 @@ export function CreateVocherDialog({
   };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px]">
+      <DialogContent className="max-w-2xl">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit((v) => mutationCreateVocher.mutate(v))}
@@ -270,6 +272,27 @@ export function CreateVocherDialog({
                     date={field.value}
                     setDate={field.onChange}
                   />
+                  {fieldState.invalid && (
+                    <FormMessage className="col-span-3 col-start-2" />
+                  )}
+                </FormItem>
+              )}
+            />
+
+            {/* Description */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field, fieldState }) => (
+                <FormItem className="grid grid-cols-4 items-center gap-x-4">
+                  <FormLabel className="text-right">Description</FormLabel>
+                  <FormControl className="col-span-3">
+                    <Textarea
+                      placeholder="Description du verssement"
+                      {...field}
+                      value={field.value || ""}
+                    />
+                  </FormControl>
                   {fieldState.invalid && (
                     <FormMessage className="col-span-3 col-start-2" />
                   )}

@@ -92,7 +92,8 @@ export const createVocher = async (
   next: NextFunction
 ) => {
   try {
-    const { remuneration, quantity, workerId, typeId, date } = req.body;
+    const { remuneration, quantity, workerId, typeId, date, description } =
+      req.body;
     let requireField = "";
     if (!remuneration || typeof remuneration != "number")
       requireField = "rémuneration";
@@ -104,12 +105,17 @@ export const createVocher = async (
       return next(
         new ExpressError(`Le champ ${requireField} est requis.`, 400)
       );
+    if (
+      !!description &&
+      (typeof description != "string" || description.length > 140)
+    )
+      throw new ExpressError("La description n'est pas valide", 400);
 
     const worker = await WorkerModel.findFirst({ where: { id: workerId } });
     if (!worker) return next(new ExpressError("Aucun travailleur trouvé", 404));
 
     const vochers = await VocherModel.create({
-      data: { remuneration, quantity, workerId, typeId, date },
+      data: { remuneration, quantity, workerId, typeId, date, description },
     });
     res.status(200).json(vochers);
   } catch (error) {
@@ -272,12 +278,14 @@ export const modifyVocher = async (
 ) => {
   try {
     const { vocherId } = req.params;
-    const { remuneration, quantity, typeId, date } = req.body;
+    const { remuneration, quantity, typeId, date, description } = req.body;
     if (
       (!!remuneration && typeof remuneration != "number") ||
       (!!quantity && typeof quantity != "number") ||
       (!!typeId && typeof typeId != "string") ||
-      (!!date && typeof date != "string")
+      (!!date && typeof date != "string") ||
+      (!!description &&
+        (typeof description != "string" || description.length > 140))
     )
       throw new ExpressError("Types error", 400);
 
@@ -296,7 +304,7 @@ export const modifyVocher = async (
 
     await VocherModel.update({
       where: { id: vocherId },
-      data: { date, quantity, remuneration, typeId },
+      data: { date, quantity, remuneration, typeId, description },
     });
 
     res.status(200).json({ message: "Bon modifié avec succès" });

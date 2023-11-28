@@ -11,13 +11,15 @@ export const SimpleTooltip = ({
   content,
   className,
   triggerClassName,
+  delayDuration = 500,
 }: PropsWithChildren<{
   content: React.ReactNode;
   className?: string;
   triggerClassName?: string;
+  delayDuration?: number;
 }>) => (
   <TooltipProvider>
-    <Tooltip>
+    <Tooltip delayDuration={delayDuration}>
       <TooltipTrigger className={triggerClassName}>{children}</TooltipTrigger>
       <TooltipContent className={className}>{content}</TooltipContent>
     </Tooltip>

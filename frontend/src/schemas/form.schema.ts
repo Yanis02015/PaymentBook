@@ -38,6 +38,10 @@ export const VocherFormSchema = z.object({
     .number()
     .min(10, "La rémunération du bon ne peut pas être inferieur à 10 DA."),
   quantity: z.coerce.number().min(1, "Le nombre de bon ne peut pas être zéro."),
+  description: z
+    .string()
+    .max(140, "La description est limité à 140 caractères")
+    .nullable(),
   workerId: z.string().optional(),
   typeId: z.string(),
   date: z.date(),

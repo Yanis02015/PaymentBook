@@ -38,6 +38,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { HTTPError } from "ky";
 import { VocherItem } from "@/pages/Month";
+import { Textarea } from "@/components/ui/textarea";
 
 export const UpdateVocherDialog = ({
   vocher,
@@ -109,8 +110,16 @@ export const UpdateVocherDialog = ({
       remuneration: vocher.remuneration,
       typeId: vocher.typeId,
       date: vocher.date,
+      description: vocher.description || "",
     });
-  }, [form, vocher.date, vocher.quantity, vocher.remuneration, vocher.typeId]);
+  }, [
+    form,
+    vocher.date,
+    vocher.description,
+    vocher.quantity,
+    vocher.remuneration,
+    vocher.typeId,
+  ]);
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent className="max-w-2xl">
@@ -242,6 +251,27 @@ export const UpdateVocherDialog = ({
                     date={field.value}
                     setDate={field.onChange}
                   />
+                  {fieldState.invalid && (
+                    <FormMessage className="col-span-3 col-start-2" />
+                  )}
+                </FormItem>
+              )}
+            />
+
+            {/* Description */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field, fieldState }) => (
+                <FormItem className="grid grid-cols-4 items-center gap-x-4">
+                  <FormLabel className="text-right">Description</FormLabel>
+                  <FormControl className="col-span-3">
+                    <Textarea
+                      placeholder="Description du verssement"
+                      {...field}
+                      value={field.value || ""}
+                    />
+                  </FormControl>
                   {fieldState.invalid && (
                     <FormMessage className="col-span-3 col-start-2" />
                   )}

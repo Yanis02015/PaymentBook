@@ -16,6 +16,7 @@ export const VocherSchema = z.object({
   workerId: z.string(),
   Worker: WorkerSchema.optional(),
   typeId: z.string(),
+  description: z.string().nullable(),
   Type: VocherTypeSchema.optional(),
   date: z.coerce.date(),
   createdAt: z.coerce.date(),

@@ -132,3 +132,17 @@ export const getPaymentsOfMonth = async (
     },
   });
 };
+
+export const deletePayment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { paymentId } = req.params;
+    await PaymentModel.delete({ where: { id: paymentId } });
+    res.status(200).json({ message: "Versement supprimé avec succès" });
+  } catch (error) {
+    next(error);
+  }
+};
