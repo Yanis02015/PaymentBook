@@ -115,7 +115,14 @@ export const createVocher = async (
     if (!worker) return next(new ExpressError("Aucun travailleur trouvé", 404));
 
     const vochers = await VocherModel.create({
-      data: { remuneration, quantity, workerId, typeId, date, description },
+      data: {
+        remuneration,
+        quantity,
+        workerId,
+        typeId,
+        date,
+        description: description || undefined,
+      },
     });
     res.status(200).json(vochers);
   } catch (error) {
@@ -304,7 +311,13 @@ export const modifyVocher = async (
 
     await VocherModel.update({
       where: { id: vocherId },
-      data: { date, quantity, remuneration, typeId, description },
+      data: {
+        date,
+        quantity,
+        remuneration,
+        typeId,
+        description: description || undefined,
+      },
     });
 
     res.status(200).json({ message: "Bon modifié avec succès" });
