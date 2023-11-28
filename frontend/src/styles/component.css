@@ -4,3 +4,9 @@
 /* .maximize-icon {
   opacity: 0;
 } */
+.print-button:hover .print-text {
+  display: flex;
+}
+.print-text {
+  display: none;
+}

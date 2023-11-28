@@ -8,7 +8,13 @@ import { VochersPerMonthSchema } from "@/schemas/vocher.schema";
 import { WorkerSchema } from "@/schemas/worker.schema";
 import "@/styles/component.css";
 import { formatPayment, getFormatedDate } from "@/utils/functions";
-import { AlertTriangle, DollarSign, Maximize2 } from "lucide-react";
+import {
+  AlertTriangle,
+  DollarSign,
+  Loader2,
+  Maximize2,
+  Printer,
+} from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Carousel, Slide, Slider, cn } from "react-scroll-snap-anime-slider";
@@ -25,6 +31,7 @@ import {
 } from "../ui/card";
 import { CreatePaymentForMonthDialog } from "./dialogs/create-payment-dialog";
 import { PaymentPayRest } from "./payment-pay-rest";
+import { usePrintInvoiceMonth } from "@/hooks/use-print-invoice-month";
 
 const getThemeByVocher = (rest: number) => {
   if (rest > 0) return "bg-teal-200/20";
@@ -45,6 +52,9 @@ export const PaymentMonthCard = ({
     vocherPerMonth.date.getMonth() + 1
   }-${vocherPerMonth.date.getFullYear()}`;
 
+  const printMonthInvoice = usePrintInvoiceMonth();
+  const onPrint = () =>
+    printMonthInvoice.mutate({ vocherMonth: vocherPerMonth, worker });
   return (
     <Card
       className={cn(
@@ -159,19 +169,37 @@ export const PaymentMonthCard = ({
         />
       )}
 
-      <Link
-        to={link}
-        className={cn(
-          buttonVariants({
-            size: "icon",
-            variant: "ghost",
-            className:
-              "absolute top-3 right-3 maximize-icon transition-all ease-out duration-200 hover:bg-transparent hover:text-green-500 lg:opacity-0 lg:text-foreground text-muted-foreground",
-          })
-        )}
-      >
-        <Maximize2 />
-      </Link>
+      <div className="flex absolute top-3 right-3">
+        <Button
+          onClick={onPrint}
+          size="icon"
+          disabled={printMonthInvoice.isLoading}
+          variant="ghost"
+          className={cn(
+            "maximize-icon transition-all ease-out duration-200 hover:bg-transparent hover:text-blue-500 lg:text-foreground text-muted-foreground",
+            !printMonthInvoice.isLoading && "lg:opacity-0"
+          )}
+        >
+          {printMonthInvoice.isLoading ? (
+            <Loader2 className="animate-spin text-blue-500" />
+          ) : (
+            <Printer />
+          )}
+        </Button>
+        <Link
+          to={link}
+          className={cn(
+            buttonVariants({
+              size: "icon",
+              variant: "ghost",
+              className:
+                "maximize-icon transition-all ease-out duration-200 hover:bg-transparent hover:text-green-500 lg:opacity-0 lg:text-foreground text-muted-foreground",
+            })
+          )}
+        >
+          <Maximize2 />
+        </Link>
+      </div>
     </Card>
   );
 };

@@ -7,6 +7,7 @@ import { CreateVocherDialog } from "@/components/my/dialogs/create-vocher-dialog
 import { DeletePaymentAlert } from "@/components/my/dialogs/month/delete-payment-alert";
 import { DeleteVocherAlert } from "@/components/my/dialogs/month/delete-vocher-alert";
 import { UpdateVocherDialog } from "@/components/my/dialogs/month/update-vocher-dialog";
+import { PrintButton } from "@/components/my/print/print-button";
 import { Button } from "@/components/ui/button";
 import { SimpleTooltip } from "@/components/utils/simple-tooltip";
 import { PaymentType } from "@/schemas/payment.schema";
@@ -77,6 +78,12 @@ export default function Month() {
           onCreateVocher={() => setOpenCreateVocher(true)}
         />
       </div>
+
+      <PrintButton
+        vocherMonth={vocherMonth}
+        worker={worker}
+        className="fixed right-3 top-3 md:top-auto md:bottom-3 pt-5 px-5 z-50"
+      />
 
       {/* Dialogs */}
       <CreatePaymentForMonthDialog
@@ -270,6 +277,7 @@ const PaymentsList = ({
         )}
         {payments.map((payment) => (
           <PaymentItem
+            key={payment.id}
             payment={payment}
             onDeletePayment={() => {
               setSelectedPaymentId(payment.id);
