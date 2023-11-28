@@ -121,7 +121,7 @@ export const createVocher = async (
         workerId,
         typeId,
         date,
-        description: description || undefined,
+        description: description || null,
       },
     });
     res.status(200).json(vochers);
@@ -285,7 +285,8 @@ export const modifyVocher = async (
 ) => {
   try {
     const { vocherId } = req.params;
-    const { remuneration, quantity, typeId, date, description } = req.body;
+    const { remuneration, quantity, typeId, date } = req.body;
+    let { description } = req.body;
     if (
       (!!remuneration && typeof remuneration != "number") ||
       (!!quantity && typeof quantity != "number") ||
@@ -316,7 +317,7 @@ export const modifyVocher = async (
         quantity,
         remuneration,
         typeId,
-        description: description || undefined,
+        description: description || null,
       },
     });
 
