@@ -30,8 +30,8 @@ export const buildDataInvoice = async (
       ),
     },
     sender: {
-      company: "Fatah Transport",
-      address: "Sidi Ali Lebher",
+      company: "OXI LOG",
+      address: "Sidi Ali Lebhar",
       zip: "06000",
       city: "Béjaïa",
       country: "Algerie",
@@ -42,9 +42,7 @@ export const buildDataInvoice = async (
       custom2: worker.email || undefined,
       custom3: worker.phonenumber || undefined,
       address: worker.address || undefined,
-      city: "Béjaia",
       country: "Algerie",
-      zip: "06000",
     },
     "bottom-notice":
       vocherMonth.rest === 0
