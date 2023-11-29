@@ -11,11 +11,11 @@ export const usePrintInvoiceMonth = () => {
       const result = await easyinvoice.createInvoice(invoiceData);
       easyinvoice.print(result.pdf);
     },
-    onError: (error: Error) => {
-      console.log(error);
+    onError: () => {
       toast({
         title: "Oh oh, impression échoués",
-        description: error.message,
+        description:
+          "Assurez vous d'avoir une connexion internet durant l'impression.",
         variant: "destructive",
       });
     },

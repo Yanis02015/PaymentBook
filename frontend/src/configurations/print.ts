@@ -1,7 +1,7 @@
 import { VocherMonthType, VocherType } from "@/schemas/vocher.schema";
 import { WorkerType } from "@/schemas/worker.schema";
 import { getFormatedDate } from "@/utils/functions";
-import { InvoiceProduct, InvoiceData } from "easyinvoice";
+import { InvoiceData, InvoiceProduct } from "easyinvoice";
 
 export const buildProductInvoice = (
   vochers: VocherType[]
@@ -19,13 +19,15 @@ export const buildProductInvoice = (
 export const buildDataInvoice = async (
   products: InvoiceProduct[],
   worker: WorkerType,
-  number: string
+  vocherMonth: VocherMonthType
 ): Promise<InvoiceData> => {
   const date = getFormatedDate().fullDate;
   const { htmlPrint } = await import("@/configurations/html-print");
   return {
     customize: {
-      template: btoa(htmlPrint),
+      template: btoa(
+        htmlPrint(vocherMonth.Payments, vocherMonth.pay, vocherMonth.rest)
+      ),
     },
     sender: {
       company: "Fatah Transport",
@@ -44,8 +46,12 @@ export const buildDataInvoice = async (
       country: "Algerie",
       zip: "06000",
     },
+    "bottom-notice":
+      vocherMonth.rest === 0
+        ? `Le mois de « ${vocherMonth.month} » à été soldé.`
+        : undefined,
     information: {
-      number,
+      number: vocherMonth.month,
       date,
     },
     products,
@@ -54,12 +60,13 @@ export const buildDataInvoice = async (
       currency: "DZD",
     },
     translate: {
-      invoice: "Facture",
+      invoice: `Facture mensuel`,
       number: "Mois",
       subtotal: "Sous-total",
       products: "Description",
       quantity: "Quantité",
       price: "Prix",
+      total: "Total des missions",
     },
   };
 };
@@ -69,5 +76,5 @@ export const getMonthInvoiceData = async (
   worker: WorkerType
 ) => {
   const products = buildProductInvoice(vocherMonth.Vochers);
-  return await buildDataInvoice(products, worker, vocherMonth.month);
+  return await buildDataInvoice(products, worker, vocherMonth);
 };

@@ -1,6 +1,19 @@
-export const htmlPrint = `<html>
+import { PaymentType } from "@/schemas/payment.schema";
+import { PaymentTypes } from "@/utils/enum";
+import {
+  formatPaymentForInvoice,
+  getFormatedDate,
+  removeAccents,
+} from "@/utils/functions";
+
+export const htmlPrint = (
+  payments: PaymentType[],
+  pay: number,
+  rest: number
+) => `<html>
 <head>
 <!--    <link rel="stylesheet" type="text/css" href="style.css">-->
+<meta charset="UTF-8" />
 </head>
 <body>
 <style>
@@ -62,6 +75,10 @@ export const htmlPrint = `<html>
     td{
         /*border: 1px black solid;*/
         font-size: x-small;
+    }
+
+    .table-title {
+        font-size: small;
     }
 
     #header-col-1{
@@ -144,6 +161,18 @@ export const htmlPrint = `<html>
         text-align: right;
     }
 
+    #payment-table thead tr td:nth-child(2) {
+        text-align: center;
+    }
+
+    #payment-table thead tr td:nth-child(3), #payment-table thead tr td:nth-child(4) {
+        text-align: right;
+    }
+
+    #payment-table tbody tr td:nth-child(3), #payment-table tbody tr td:nth-child(4) {
+        text-align: right;
+    }
+
     #total-wrapper-col-1{
         width: 50%;
     }
@@ -166,6 +195,11 @@ export const htmlPrint = `<html>
 
     #bottom-notice-wrapper tbody tr td{
         text-align: center;
+    }
+    
+    .total-generale {
+        text-align: center;
+        font-size: medium;
     }
 </style>
 <table id="header">
@@ -222,6 +256,9 @@ export const htmlPrint = `<html>
 </table>
 <br/>
 <br/>
+
+<b class="table-title">Liste des missions</b>
+<br/>
 <table id="products-table">
     <thead>
     <tr>
@@ -260,7 +297,7 @@ export const htmlPrint = `<html>
     </tr>
     </tfoot>
 </table>
-<br/>
+
 <table id="total-wrapper">
     <thead>
     <tr>
@@ -297,6 +334,76 @@ export const htmlPrint = `<html>
     </tr>
     </tfoot>
 </table>
+
+<br/>
+<!-- Payments -->
+<b class="table-title">Liste des versements</b>
+<br/>
+<table id="payment-table">
+    <thead>
+    <tr>
+        <th id="products-table-col-1"></th>
+        <th id="products-table-col-2"></th>
+        <th id="products-table-col-3"></th>
+    </tr>
+    <tr>
+        <td><b>Date</b></td>
+        <td><b>Type</b></td>
+        <td><b>Montant</b></td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <hr/>
+        </td>
+    </tr>
+    </thead>
+    
+    <tbody>
+    ${getPaymentTable(payments)}
+    </tbody>
+    <tfoot>
+    <tr>
+        <td colspan="4">
+            <hr/>
+        </td>
+    </tr>
+    </tfoot>
+</table>
+
+<!-- Payment total -->
+<table id="total-wrapper">
+    <thead>
+    <tr>
+        <th id="total-wrapper-col-1"></th>
+        <th id="total-wrapper-col-2"></th>
+        <th id="total-wrapper-col-3"></th>
+    </tr>
+    </thead>
+    <tfoot>
+    <tr>
+        <td></td>
+        <td><b>Total des versements:</b></td>
+        <td>${formatPaymentForInvoice(pay)}</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td colspan="2">
+            <hr/>
+        </td>
+    </tr>
+    </tfoot>
+</table>
+<br/>
+<br/>
+
+<table>
+    <tr>
+    <td class="total-generale">
+        <b>Montant restant du: ${formatPaymentForInvoice(rest)}</b>
+    </td>
+    </tr>
+</table>
+
 <br/>
 <br/>
 <table id="bottom-notice-wrapper">
@@ -313,3 +420,17 @@ export const htmlPrint = `<html>
 </table>
 </body>
 </html>`;
+
+const getPaymentTable = (payments: PaymentType[]) => {
+  let html = "";
+  for (const payment of payments) {
+    html += `
+          <tr>
+            <td>${getFormatedDate(payment.createdAt).fullDate}</td>
+            <td align="center">${removeAccents(PaymentTypes[payment.type])}</td>
+            <td>${formatPaymentForInvoice(payment.amount)}</td>
+          </tr>`;
+  }
+
+  return html;
+};
