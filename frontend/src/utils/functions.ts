@@ -106,6 +106,21 @@ export const formatPaymentForInvoice = (payment: number | string) => {
   );
 };
 
+export const destructuringMatricule = (matricule: string) => {
+  const matTab = matricule.split("-");
+  if (matTab.length < 3) return;
+  return {
+    matriculeID: matTab[0],
+    matriculeYear: matTab[1],
+    matriculeWilaya: matTab[2],
+  };
+};
+
+export const generateMatricule = (id: string, year: string, wilaya: string) => {
+  if (id.length < 6) id = `0${id}`;
+  return `${id}-${year}-${wilaya}`;
+};
+
 export const monthToDate = (monthYear: string) => {
   const tab = monthYear.split("-");
   if (tab.length != 2) return;

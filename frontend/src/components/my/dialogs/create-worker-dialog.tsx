@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { WorkerFormSchema } from "@/schemas/form.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -41,7 +42,9 @@ export function CreateWorkerDialog({
     defaultValues: {
       firstname: "",
       lastname: "",
-      matricule: "",
+      matriculeId: "",
+      matriculeYear: "",
+      matriculeWilaya: "",
     },
   });
 
@@ -93,21 +96,60 @@ export function CreateWorkerDialog({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="matricule"
-              render={({ field, fieldState }) => (
-                <FormItem className="grid grid-cols-4 items-center gap-x-4">
-                  <FormLabel className="text-right">Matricule</FormLabel>
-                  <FormControl className="col-span-3">
-                    <Input placeholder="Matricule" {...field} />
-                  </FormControl>
-                  {fieldState.invalid && (
-                    <FormMessage className="col-span-3 col-start-2" />
+            <div className="grid grid-cols-4 items-center gap-x-4">
+              <FormLabel
+                htmlFor="matriculeId"
+                className={cn(
+                  "text-right",
+                  (form.formState.errors.matriculeId?.message ||
+                    form.formState.errors.matriculeYear?.message ||
+                    form.formState.errors.matriculeWilaya?.message) &&
+                    "text-destructive"
+                )}
+              >
+                Matricule
+              </FormLabel>
+              <div className="grid grid-cols-12 items-center col-span-3 gap-2">
+                <FormField
+                  control={form.control}
+                  name="matriculeId"
+                  render={({ field }) => (
+                    <FormItem className="col-span-5">
+                      <FormControl className="">
+                        <Input id="matriculeId" placeholder="ID" {...field} />
+                      </FormControl>
+                    </FormItem>
                   )}
-                </FormItem>
-              )}
-            />
+                />
+                <FormField
+                  control={form.control}
+                  name="matriculeYear"
+                  render={({ field }) => (
+                    <FormItem className="col-span-4">
+                      <FormControl className="">
+                        <Input placeholder="Année" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="matriculeWilaya"
+                  render={({ field }) => (
+                    <FormItem className="col-span-3">
+                      <FormControl className="">
+                        <Input placeholder="06" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <FormMessage className="col-span-3 col-start-2 mt-1">
+                {form.formState.errors.matriculeId?.message ||
+                  form.formState.errors.matriculeYear?.message ||
+                  form.formState.errors.matriculeWilaya?.message}
+              </FormMessage>
+            </div>
             <DialogFooter>
               <Button disabled={isLoadind} type="submit">
                 {isLoadind && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

@@ -30,7 +30,11 @@ import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { WorkerFormSchema } from "@/schemas/form.schema";
 import { WorkerType } from "@/schemas/worker.schema";
-import { getFormatedDate } from "@/utils/functions";
+import {
+  destructuringMatricule,
+  generateMatricule,
+  getFormatedDate,
+} from "@/utils/functions";
 import { queries } from "@/utils/queryKeys";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -47,6 +51,7 @@ export const ModifyWorkerDialog = ({
 }: PropsWithChildren<{ worker: WorkerType; className?: string }>) => {
   const [open, setOpen] = useState(false);
 
+  const matriculeStructured = destructuringMatricule(worker.matricule);
   const form = useForm<z.infer<typeof WorkerFormSchema>>({
     resolver: zodResolver(WorkerFormSchema),
     defaultValues: {
@@ -55,7 +60,9 @@ export const ModifyWorkerDialog = ({
       email: worker.email || undefined,
       firstname: worker.firstname,
       lastname: worker.lastname,
-      matricule: worker.matricule,
+      matriculeId: matriculeStructured?.matriculeID || "",
+      matriculeYear: matriculeStructured?.matriculeYear || "",
+      matriculeWilaya: matriculeStructured?.matriculeWilaya || "",
       phonenumber: worker.phonenumber || undefined,
     },
   });
@@ -84,12 +91,19 @@ export const ModifyWorkerDialog = ({
   const {
     firstname,
     lastname,
-    matricule,
     address,
     birthdate,
+    matriculeId,
+    matriculeWilaya,
+    matriculeYear,
     email,
     phonenumber,
   } = form.watch();
+  const matricule = generateMatricule(
+    matriculeId,
+    matriculeWilaya,
+    matriculeYear
+  );
 
   const hasNoChange = useCallback(() => {
     if (
@@ -127,7 +141,9 @@ export const ModifyWorkerDialog = ({
       email: worker.email || undefined,
       firstname: worker.firstname,
       lastname: worker.lastname,
-      matricule: worker.matricule,
+      matriculeId: matriculeStructured?.matriculeID || "",
+      matriculeYear: matriculeStructured?.matriculeYear || "",
+      matriculeWilaya: matriculeStructured?.matriculeWilaya || "",
       phonenumber: worker.phonenumber || undefined,
     });
     setOpen(visibility);
@@ -286,6 +302,59 @@ export const ModifyWorkerDialog = ({
                 </FormItem>
               )}
             />
+
+            <div className="grid grid-cols-4 items-center gap-x-4">
+              <FormLabel className="text-right">Matricule</FormLabel>
+              <div className="grid grid-cols-12 items-center col-span-3 gap-2">
+                <FormField
+                  control={form.control}
+                  name="matriculeId"
+                  render={({ field, fieldState }) => (
+                    <FormItem className="col-span-5">
+                      <FormControl className="">
+                        <Input placeholder="ID" {...field} />
+                      </FormControl>
+                      {fieldState.invalid && (
+                        <FormMessage className="col-span-3 col-start-2" />
+                      )}
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="matriculeYear"
+                  render={({ field, fieldState }) => (
+                    <FormItem className="col-span-4">
+                      <FormControl className="">
+                        <Input placeholder="Matricule" {...field} />
+                      </FormControl>
+                      {fieldState.invalid && (
+                        <FormMessage className="col-span-3 col-start-2" />
+                      )}
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="matriculeWilaya"
+                  render={({ field, fieldState }) => (
+                    <FormItem className="col-span-3">
+                      <FormControl className="">
+                        <Input placeholder="Matricule" {...field} />
+                      </FormControl>
+                      {fieldState.invalid && (
+                        <FormMessage className="col-span-3 col-start-2" />
+                      )}
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <span className="col-span-3 col-start-2">
+                {form.formState.errors.matriculeId?.message ||
+                  form.formState.errors.matriculeYear?.message ||
+                  form.formState.errors.matriculeWilaya?.message}
+              </span>
+            </div>
 
             <DialogFooter className="gap-2 pt-3">
               <DialogClose className={buttonVariants({ variant: "outline" })}>

@@ -17,10 +17,21 @@ export const WorkerFormSchema = z.object({
   lastname: z
     .string()
     .min(1, { message: "Le prénom du travailleur ne peux pas être vide." }),
-  matricule: z.string().min(1, {
-    message: "La matricule du travailleur ne peux pas être vide.",
-  }),
-
+  // matricule: z.string().min(1, {
+  //   message: "La matricule du travailleur ne peux pas être vide.",
+  // }),
+  matriculeId: z
+    .string()
+    .min(5, {
+      message: "La matricule ID du travailleur ne peux pas être vide.",
+    })
+    .max(6, {
+      message: "La matricule ID du travailleur ne peux pas être vide.",
+    }),
+  matriculeYear: z.string().length(3, { message: "Matricule date incorrecte" }),
+  matriculeWilaya: z
+    .string()
+    .length(2, { message: "La wilaya de la matricule incorrecte" }),
   phonenumber: z
     .string()
     .regex(phonenumberRegex, { message: "Numéro de téléphone mal formé" })
@@ -29,7 +40,7 @@ export const WorkerFormSchema = z.object({
   birthdate: z.coerce.date().optional(),
   email: z
     .string()
-    .email({ message: "Le format de l'email est incorrect" })
+    .email({ message: "Le format de l'email est incorrecte" })
     .optional(),
 });
 
