@@ -1,5 +1,7 @@
+import { WorkerFormSchema } from "@/schemas/form.schema";
 import { format, formatDistanceStrict } from "date-fns";
 import { fr } from "date-fns/locale";
+import { z } from "zod";
 
 export const removeAccents = (text: string) => {
   const accent = [
@@ -116,7 +118,15 @@ export const destructuringMatricule = (matricule: string) => {
   };
 };
 
-export const generateMatricule = (id: string, year: string, wilaya: string) => {
+// export const generateMatricule = (id: string, year: string, wilaya: string) => {
+//   if (id.length < 6) id = `0${id}`;
+//   return `${id}-${year}-${wilaya}`;
+// };
+export const generateMatricule = ({
+  matriculeId: id,
+  matriculeYear: year,
+  matriculeWilaya: wilaya,
+}: z.infer<typeof WorkerFormSchema>) => {
   if (id.length < 6) id = `0${id}`;
   return `${id}-${year}-${wilaya}`;
 };

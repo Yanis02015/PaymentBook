@@ -55,14 +55,15 @@ export default function Month() {
       }),
     enabled: !!id && !!date && !!worker,
   });
-  if (!date) return "Date invalide";
+  if (!date) return <span>Date invalide</span>;
   if (error instanceof HTTPError && error.response.status == 404)
     return <NotFound message="Aucun employé trouvé" />;
   if (isErrorWorker)
-    return "Impossible de récupérer les informations du chauffeur";
+    return <span>Impossible de récupérer les informations du chauffeur</span>;
   if (isErrorVocherMonth)
-    return "Impossible de récupérer les informations du mois";
-  if (isLoadingVocherMonth || isLoadingWorker) return "Chargement...";
+    return <span>Impossible de récupérer les informations du mois</span>;
+  if (isLoadingVocherMonth || isLoadingWorker)
+    return <span>Chargement...</span>;
   return (
     <div>
       <BannerMonth vocher={vocherMonth} worker={worker} />

@@ -23,15 +23,17 @@ export const WorkerFormSchema = z.object({
   matriculeId: z
     .string()
     .min(5, {
-      message: "La matricule ID du travailleur ne peux pas être vide.",
+      message: "La matricule «ID» du chauffeur ne peux pas être inferieur à 5.",
     })
     .max(6, {
-      message: "La matricule ID du travailleur ne peux pas être vide.",
+      message: "La matricule «ID» du chauffeur ne peux pas être superieur à 6.",
     }),
-  matriculeYear: z.string().length(3, { message: "Matricule date incorrecte" }),
+  matriculeYear: z
+    .string()
+    .length(3, { message: "Matricule «Date» incorrecte." }),
   matriculeWilaya: z
     .string()
-    .length(2, { message: "La wilaya de la matricule incorrecte" }),
+    .length(2, { message: "La wilaya de la matricule incorrecte." }),
   phonenumber: z
     .string()
     .regex(phonenumberRegex, { message: "Numéro de téléphone mal formé" })

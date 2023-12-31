@@ -40,7 +40,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { HTTPError } from "ky";
 import { CalendarIcon, Loader2 } from "lucide-react";
-import { PropsWithChildren, useCallback, useState } from "react";
+import { PropsWithChildren, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -88,24 +88,11 @@ export const ModifyWorkerDialog = ({
   const onSubmit = (values: z.infer<typeof WorkerFormSchema>) => {
     mutationUpdateWorker.mutate({ worker: values, workerId: worker.id });
   };
-  const {
-    firstname,
-    lastname,
-    address,
-    birthdate,
-    matriculeId,
-    matriculeWilaya,
-    matriculeYear,
-    email,
-    phonenumber,
-  } = form.watch();
-  const matricule = generateMatricule(
-    matriculeId,
-    matriculeWilaya,
-    matriculeYear
-  );
+  const { firstname, lastname, address, birthdate, email, phonenumber } =
+    form.watch();
+  const matricule = generateMatricule(form.watch());
 
-  const hasNoChange = useCallback(() => {
+  const hasNoChange = useMemo(() => {
     if (
       worker.matricule == matricule &&
       worker.firstname == firstname &&
@@ -304,69 +291,71 @@ export const ModifyWorkerDialog = ({
             />
 
             <div className="grid grid-cols-4 items-center gap-x-4">
-              <FormLabel className="text-right">Matricule</FormLabel>
+              <FormLabel
+                htmlFor="matriculeId"
+                className={cn(
+                  "text-right",
+                  (form.formState.errors.matriculeId?.message ||
+                    form.formState.errors.matriculeYear?.message ||
+                    form.formState.errors.matriculeWilaya?.message) &&
+                    "text-destructive"
+                )}
+              >
+                Matricule
+              </FormLabel>
               <div className="grid grid-cols-12 items-center col-span-3 gap-2">
                 <FormField
                   control={form.control}
                   name="matriculeId"
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <FormItem className="col-span-5">
                       <FormControl className="">
-                        <Input placeholder="ID" {...field} />
+                        <Input id="matriculeId" placeholder="ID" {...field} />
                       </FormControl>
-                      {fieldState.invalid && (
-                        <FormMessage className="col-span-3 col-start-2" />
-                      )}
                     </FormItem>
                   )}
                 />
                 <FormField
                   control={form.control}
                   name="matriculeYear"
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <FormItem className="col-span-4">
                       <FormControl className="">
-                        <Input placeholder="Matricule" {...field} />
+                        <Input placeholder="Année" {...field} />
                       </FormControl>
-                      {fieldState.invalid && (
-                        <FormMessage className="col-span-3 col-start-2" />
-                      )}
                     </FormItem>
                   )}
                 />
                 <FormField
                   control={form.control}
                   name="matriculeWilaya"
-                  render={({ field, fieldState }) => (
+                  render={({ field }) => (
                     <FormItem className="col-span-3">
                       <FormControl className="">
-                        <Input placeholder="Matricule" {...field} />
+                        <Input placeholder="06" {...field} />
                       </FormControl>
-                      {fieldState.invalid && (
-                        <FormMessage className="col-span-3 col-start-2" />
-                      )}
                     </FormItem>
                   )}
                 />
               </div>
-              <span className="col-span-3 col-start-2">
+              <FormMessage className="col-span-3 col-start-2 mt-1">
                 {form.formState.errors.matriculeId?.message ||
                   form.formState.errors.matriculeYear?.message ||
                   form.formState.errors.matriculeWilaya?.message}
-              </span>
+              </FormMessage>
             </div>
 
             <DialogFooter className="gap-2 pt-3">
               <DialogClose className={buttonVariants({ variant: "outline" })}>
                 Fermer
               </DialogClose>
-              <Button
-                disabled={hasNoChange() || mutationUpdateWorker.isLoading}
-              >
+              <Button disabled={hasNoChange || mutationUpdateWorker.isLoading}>
                 {mutationUpdateWorker.isLoading && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Aucune modification faite
+                {hasNoChange
+                  ? "Aucune modification faite"
+                  : "Valider les modifications"}
               </Button>
             </DialogFooter>
           </form>

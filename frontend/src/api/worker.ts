@@ -18,11 +18,7 @@ export const createWorker = async (
   return await MakeRequest.post("workers", {
     json: {
       ...worker,
-      matricule: generateMatricule(
-        worker.matriculeId,
-        worker.matriculeYear,
-        worker.matriculeWilaya
-      ),
+      matricule: generateMatricule(worker),
     },
   }).json();
 };
@@ -38,11 +34,7 @@ export const modifyWorker = async ({
     await MakeRequest.put(`workers/${workerId}`, {
       json: {
         ...worker,
-        matricule: generateMatricule(
-          worker.matriculeId,
-          worker.matriculeYear,
-          worker.matriculeWilaya
-        ),
+        matricule: generateMatricule(worker),
       },
     })
   ).json();
