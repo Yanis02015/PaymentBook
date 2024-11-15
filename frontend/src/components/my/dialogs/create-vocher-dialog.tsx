@@ -30,6 +30,7 @@ import { z } from "zod";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -188,30 +189,32 @@ export function CreateVocherDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {isLoadindVocherTypes ? (
-                          <div className="text-sm py-3 flex justify-center items-center">
-                            <Loader2
-                              strokeWidth={3}
-                              className="mr-2 h-4 w-4 animate-spin"
-                            />
-                            Récupération des types
-                          </div>
-                        ) : isErrorVocherTypes ? (
-                          <div className="text-sm py-3 flex justify-center items-center text-destructive font-bold">
-                            <X strokeWidth={4} className="mr-2 h-4 w-4" />
-                            Error lors de la récupération des donnée!
-                          </div>
-                        ) : (
-                          vocherTypes.map((type) => (
-                            <SelectItem
-                              className="capitalize"
-                              key={type.id}
-                              value={type.id}
-                            >
-                              {type.name}
-                            </SelectItem>
-                          ))
-                        )}
+                        <SelectGroup className="max-h-72 !overflow-y-scroll">
+                          {isLoadindVocherTypes ? (
+                            <div className="text-sm py-3 flex justify-center items-center">
+                              <Loader2
+                                strokeWidth={3}
+                                className="mr-2 h-4 w-4 animate-spin"
+                              />
+                              Récupération des types
+                            </div>
+                          ) : isErrorVocherTypes ? (
+                            <div className="text-sm py-3 flex justify-center items-center text-destructive font-bold">
+                              <X strokeWidth={4} className="mr-2 h-4 w-4" />
+                              Error lors de la récupération des donnée!
+                            </div>
+                          ) : (
+                            vocherTypes.map((type) => (
+                              <SelectItem
+                                className="capitalize"
+                                key={type.id}
+                                value={type.id}
+                              >
+                                {type.name}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectGroup>
                       </SelectContent>
                     </Select>
                     <Button
