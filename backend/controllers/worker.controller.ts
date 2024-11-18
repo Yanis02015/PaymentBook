@@ -7,7 +7,6 @@ import {
   WorkerModel,
 } from "../configurations/db";
 import { Worker } from "@prisma/client";
-import { getYearsWorkerJob } from '@prisma/client/sql'
 
 export const createWorker = async (
   req: Request,
@@ -105,7 +104,7 @@ export const getMissionsYears = async (
     const worker = await WorkerModel.findFirst({ where: { id: workerId } });
     if (!worker) throw new ExpressError("Travailleur non trouvé", 404);
 
-    const years = await Prisma.$queryRawTyped(getYearsWorkerJob(workerId))
+    const years = await getYearsWorkerJob(workerId)
     const castedYears = years.map((y) => ({
       ...y,
       vochers: parseInt(y.vochers.toString(), 10),
@@ -158,22 +157,28 @@ export const modifyWorker = async (
 };
 
 // Function
-export const getYearsWorkerJob_OLD = async (
+export const getYearsWorkerJob = async (
   workerId: string
-): Promise<{ year: number; vochers: bigint }[]> => {
-  return await Prisma.$queryRaw`
-  SELECT 
-    EXTRACT(YEAR FROM date) as year,
-    COUNT(*) as vochers
-  FROM 
-    Vocher
-  WHERE
-    workerId=${workerId}
-  GROUP BY 
-    year
-  ORDER BY 
-    year DESC;
-`;
+) => {
+  const result = await VocherModel.groupBy({
+    by: ['date'],
+    where: {
+      workerId: workerId
+    },
+    _count: {
+      date: true
+    },
+    orderBy: {
+      date: 'desc'
+    }
+  });
+
+  const formattedResult = result.map(item => ({
+    year: new Date(item.date).getFullYear(),
+    vochers: item._count.date
+  }));
+
+  return formattedResult;
 };
 
 const getWorkerToUpdate = (
