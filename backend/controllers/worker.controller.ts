@@ -72,7 +72,7 @@ export const deleteWorker = async (
     });
     const hasRelation =
       relations.Payments > 0 || relations.Vochers > 0;
-    if (!password && (typeof password != "string" || hasRelation))
+    if (!password && hasRelation)
       throw new ExpressError(
         "L'employé ne peut pas être supprimer de cette façon, car possede des relations",
         400
