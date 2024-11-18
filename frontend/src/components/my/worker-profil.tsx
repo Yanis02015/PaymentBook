@@ -1,14 +1,10 @@
-import { getWorkerSoldeAmount } from "@/api/solde";
 import { cn } from "@/lib/utils";
 import { WorkerSchema, WorkerType } from "@/schemas/worker.schema";
-import { formatPayment, getFormatedDate } from "@/utils/functions";
-import { queries } from "@/utils/queryKeys";
+import { getFormatedDate } from "@/utils/functions";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
-import { useQuery } from "@tanstack/react-query";
 import {
   ChevronDown,
   ChevronUp,
-  DollarSign,
   LineChart,
   Pen,
   Plus,
@@ -16,11 +12,9 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
-import { Button, buttonVariants } from "../ui/button";
+import { Button } from "../ui/button";
 import { SimpleTooltip } from "../utils/simple-tooltip";
 import { DeleteWorkerAlert } from "./alerts/delete-worker-alert";
-import { CreatePaymentOutOfVocherDialog } from "./dialogs/create-payment-out-of-vocher-dialog";
-import { CreateSoldeDialog } from "./dialogs/create-solde-dialog";
 import { CreateVocherDialog } from "./dialogs/create-vocher-dialog";
 import { ModifyWorkerDialog } from "./dialogs/modify-worker";
 import { NotFoundBadge } from "./not-found-badge";
@@ -38,13 +32,7 @@ export const WorkerProfil = ({
   vocherLength: number;
 }) => {
   const [dialogVisibility, setDialogVisibility] = useState(false);
-  const [showSolde, setShowSolde] = useState(false);
 
-  const { data: solde } = useQuery({
-    queryKey: [queries.soldes, queries.soldeAmount, worker.id],
-    queryFn: () => getWorkerSoldeAmount(worker.id),
-    enabled: !!worker.id,
-  });
   return (
     <div className={cn(className)}>
       <div
@@ -72,12 +60,7 @@ export const WorkerProfil = ({
           <ModifyWorkerDialog worker={worker} className="">
             <Pen size={17} />
           </ModifyWorkerDialog>
-          <DeleteWorkerAlert
-            worker={worker}
-            canBeDeleted={
-              !solde?.payment && !solde?.amount && vocherLength == 0
-            }
-          >
+          <DeleteWorkerAlert worker={worker} canBeDeleted={vocherLength == 0}>
             <Trash2 size={17} />
           </DeleteWorkerAlert>
         </div>
@@ -99,74 +82,6 @@ export const WorkerProfil = ({
           <LineChart size={17} className="absolute left-4" />
           <p>Voir les statistique</p>
         </Button>
-
-        <div className="bg-background border rounded-lg px-3 py-2 space-y-2">
-          <p className="text-muted-foreground font-semibold">
-            Solde restant (HORS BON)
-          </p>
-          <h1 className="text-center text-2xl font-bold text-destructive pb-3 !mt-0">
-            {solde
-              ? solde?.rest
-                ? formatPayment(solde?.rest)
-                : "Aucun solde restant"
-              : "Chargement..."}
-          </h1>
-          {solde && (
-            <div className="space-y-1 pb-2 text-xs">
-              <p>
-                Total des anciens soldes:{" "}
-                <strong className="text-destructive">
-                  {formatPayment(solde.amount)}
-                </strong>
-              </p>
-              <p>
-                Total des anciens versement:{" "}
-                <strong className="text-green-500">
-                  {formatPayment(solde.payment)}
-                </strong>
-              </p>
-            </div>
-          )}
-          <Button
-            variant="link"
-            onClick={() => setShowSolde((s) => !s)}
-            className="p-0 h-auto w-auto gap-2 text-muted-foreground"
-          >
-            {showSolde ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
-            {showSolde
-              ? "Cacher les boutons du solde"
-              : "Aficher les boutons du solde"}
-          </Button>
-          {showSolde && (
-            <>
-              <CreateSoldeDialog
-                worker={worker}
-                className={buttonVariants({
-                  size: "sm",
-                  variant: "outline",
-                  className: "w-full relative",
-                })}
-              >
-                <Plus size={17} className="absolute left-4" />
-                <p>Ajouter un solde</p>
-              </CreateSoldeDialog>
-              <CreatePaymentOutOfVocherDialog
-                className={cn(
-                  buttonVariants({
-                    size: "sm",
-                    className: "w-full relative",
-                  }),
-                  "bg-blue-400 hover:bg-blue-400/90"
-                )}
-                worker={worker}
-                rest={solde?.rest || 0}
-              >
-                <DollarSign size={17} className="absolute left-4" />
-                <p>Effectuer un versement</p>
-              </CreatePaymentOutOfVocherDialog>
-            </>
-          )}
-        </div>
       </div>
 
       <CreateVocherDialog

@@ -20,7 +20,6 @@ model Worker {
   image     String    @default("default.png")
   Vochers   Vocher[]
   Payments  Payment[]
-  Soldes    Solde[]
 
   phonenumber String?
   address     String?
@@ -57,7 +56,6 @@ model Payment {
   workerId    String
   Worker      Worker      @relation(fields: [workerId], references: [id])
   month       DateTime    @default(now())
-  outOfVocher Boolean     @default(false)
 
   createdAt   DateTime    @default(now())
 }
@@ -65,16 +63,6 @@ model Payment {
 enum PaymentType {
   CASH
   GOODS
-}
-
-model Solde {
-  id          String      @id @default(uuid())
-  amount      Decimal
-  description String?
-  workerId    String
-  Worker      Worker      @relation(fields: [workerId], references: [id])
-
-  createdAt   DateTime    @default(now())
 }
 
 model Session {

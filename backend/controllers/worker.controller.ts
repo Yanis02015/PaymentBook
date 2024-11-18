@@ -3,7 +3,6 @@ import { ExpressError } from "../utils/error";
 import {
   PaymentModel,
   Prisma,
-  SoldeModel,
   VocherModel,
   WorkerModel,
 } from "../configurations/db";
@@ -68,11 +67,11 @@ export const deleteWorker = async (
     const { _count: relations } = await WorkerModel.findUniqueOrThrow({
       where: { id: workerId },
       include: {
-        _count: { select: { Payments: true, Soldes: true, Vochers: true } },
+        _count: { select: { Payments: true, Vochers: true } },
       },
     });
     const hasRelation =
-      relations.Payments > 0 || relations.Soldes > 0 || relations.Vochers > 0;
+      relations.Payments > 0 || relations.Vochers > 0;
     if (!password && (typeof password != "string" || hasRelation))
       throw new ExpressError(
         "L'employé ne peut pas être supprimer de cette façon, car possede des relations",
@@ -83,7 +82,6 @@ export const deleteWorker = async (
       if (password != process.env.ADMIN_PASSWORD)
         throw new ExpressError("Mot de passe incorrecte", 400);
 
-      await SoldeModel.deleteMany({ where: { workerId } });
       await VocherModel.deleteMany({ where: { workerId } });
       await PaymentModel.deleteMany({ where: { workerId } });
     }

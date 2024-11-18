@@ -3,13 +3,10 @@ import { ExpressError } from "../utils/error";
 import { Payment, PaymentType, Vocher } from "@prisma/client";
 import {
   PaymentModel,
-  SoldeModel,
-  VocherModel,
   WorkerModel,
 } from "../configurations/db";
 import { getMonthLimits } from "../utils/functions";
 import { getVochersOfMonth } from "./vocher.controller";
-import { getSoldesAmountsAndRest } from "../classes/solde.class";
 
 export const createPayment = async (
   req: Request,
@@ -64,57 +61,6 @@ export const createPayment = async (
   }
 };
 
-export const createPaymentOutOfVocher = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { workerId, amount, description } = req.body;
-
-    if (!workerId || !amount)
-      throw new ExpressError("Les champs requis doivent être renseigné", 400);
-    if (typeof amount != "number" || amount < 1)
-      throw new ExpressError("La mountant du versement est incorrect", 400);
-    if (description && typeof description != "string")
-      throw new ExpressError("Description incorrect", 400);
-
-    const { _sum: _sumPayment } = await PaymentModel.aggregate({
-      where: { workerId, outOfVocher: true },
-      _sum: {
-        amount: true,
-      },
-    });
-
-    const { _sum: _sumSolde } = await SoldeModel.aggregate({
-      where: { workerId },
-      _sum: {
-        amount: true,
-      },
-    });
-
-    const { rest } = await getSoldesAmountsAndRest(workerId);
-
-    if (rest.lt(amount))
-      throw new ExpressError(
-        `Le mountant du versement ne peut pas dépasser ${rest} DA`
-      );
-
-    await PaymentModel.create({
-      data: {
-        amount,
-        outOfVocher: true,
-        workerId,
-        description: description || undefined,
-      },
-    });
-
-    res.status(201).json({ message: "Versement de solde crée" });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const getPaymentsOfMonth = async (
   workerId: string,
   date: Date
@@ -128,7 +74,6 @@ export const getPaymentsOfMonth = async (
         gte: begin,
         lte: end,
       },
-      outOfVocher: false,
     },
   });
 };
