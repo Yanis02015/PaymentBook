@@ -157,28 +157,20 @@ export const modifyWorker = async (
 };
 
 // Function
-export const getYearsWorkerJob = async (
-  workerId: string
-) => {
-  const result = await VocherModel.groupBy({
-    by: ['date'],
-    where: {
-      workerId: workerId
-    },
-    _count: {
-      date: true
-    },
-    orderBy: {
-      date: 'desc'
-    }
-  });
-
-  const formattedResult = result.map(item => ({
-    year: new Date(item.date).getFullYear(),
-    vochers: item._count.date
-  }));
-
-  return formattedResult;
+export const getYearsWorkerJob = async (workerId: string): Promise<{ year: number; vochers: bigint }[]> => {
+  return await Prisma.$queryRaw`
+    SELECT
+      EXTRACT(YEAR FROM date) as year,
+      COUNT(*) as vochers
+    FROM 
+      Vocher
+    WHERE 
+      workerId = ${workerId}
+    GROUP BY 
+      EXTRACT(YEAR FROM date)
+    ORDER BY 
+      year DESC;
+  `;
 };
 
 const getWorkerToUpdate = (
