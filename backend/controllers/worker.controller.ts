@@ -7,6 +7,7 @@ import {
   WorkerModel,
 } from "../configurations/db";
 import { Worker } from "@prisma/client";
+import { getYearsWorkerJob } from '@prisma/client/sql'
 
 export const createWorker = async (
   req: Request,
@@ -104,7 +105,7 @@ export const getMissionsYears = async (
     const worker = await WorkerModel.findFirst({ where: { id: workerId } });
     if (!worker) throw new ExpressError("Travailleur non trouvé", 404);
 
-    const years = await getYearsWorkerJob(workerId);
+    const years = await Prisma.$queryRawTyped(getYearsWorkerJob(workerId))
     const castedYears = years.map((y) => ({
       ...y,
       vochers: parseInt(y.vochers.toString(), 10),
@@ -157,7 +158,7 @@ export const modifyWorker = async (
 };
 
 // Function
-export const getYearsWorkerJob = async (
+export const getYearsWorkerJob_OLD = async (
   workerId: string
 ): Promise<{ year: number; vochers: bigint }[]> => {
   return await Prisma.$queryRaw`
